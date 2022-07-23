@@ -21,6 +21,7 @@ export const rollbar = new Rollbar({
   captureUnhandledRejections: true,
   autoInstrument: true,
   environment: config.environment,
+  enabled: Boolean(config.rollbarApiKey),
 });
 
 /**
