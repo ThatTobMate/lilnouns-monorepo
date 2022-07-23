@@ -25,7 +25,7 @@ const Ideas = () => {
 
   const nullStateCopy = () => {
     if (account !== null) {
-      return 'You have no Votes.';
+      return 'You have no Lil Nouns.';
     }
     return 'Connect wallet to submit an idea.';
   };
@@ -37,23 +37,24 @@ const Ideas = () => {
       <div>
         <h3 className={classes.heading}>Ideas</h3>
         <div className={clsx('d-flex', classes.submitIdeaButtonWrapper)}>
-          <div className={classes.sortFilter}>
-            <span className={classes.sortLabel}>Sort By:</span>
-            <Form.Select aria-label="Order by" onChange={handleSortChange}>
-              {Object.keys(SORT_BY).map(k => (
-                <option value={k} key={k}>
-                  {SORT_BY[k]}
-                </option>
-              ))}
-            </Form.Select>
-          </div>
+          {ideas?.length > 0 && (
+            <div className={classes.sortFilter}>
+              <span className={classes.sortLabel}>Sort By:</span>
+              <Form.Select aria-label="Order by" onChange={handleSortChange}>
+                {Object.keys(SORT_BY).map(k => (
+                  <option value={k} key={k}>
+                    {SORT_BY[k]}
+                  </option>
+                ))}
+              </Form.Select>
+            </div>
+          )}
           {account !== undefined && hasNouns ? (
             <Button className={classes.generateBtn} onClick={() => history.push('/ideas/create')}>
               Submit Idea
             </Button>
           ) : (
             <>
-              {!isMobile && <div className={classes.nullStateCopy}>{nullStateCopy()}</div>}
               <div className={classes.nullBtnWrapper}>
                 <Button className={classes.generateBtnDisabled}>Submit Idea</Button>
               </div>
@@ -61,7 +62,7 @@ const Ideas = () => {
           )}
         </div>
       </div>
-      {isMobile && <div className={classes.nullStateCopy}>{nullStateCopy()}</div>}
+      <div className={classes.nullStateCopy}>{nullStateCopy()}</div>
       {ideas?.length ? (
         <span className="space-y-4">
           {ideas.map((idea: Idea, i) => {
