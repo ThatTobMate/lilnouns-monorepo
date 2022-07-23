@@ -1,4 +1,4 @@
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button, Form } from 'react-bootstrap';
 import { useEthers } from '@usedapp/core';
 import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
@@ -6,14 +6,18 @@ import { useUserVotes } from '../../wrappers/nounToken';
 import classes from './Ideas.module.css';
 import { isMobileScreen } from '../../utils/isMobile';
 import IdeaCard from '../IdeaCard';
-import { Idea, useIdeas } from '../../hooks/useIdeas';
+import { Idea, useIdeas, SORT_BY } from '../../hooks/useIdeas';
 
 const Ideas = () => {
   const { account } = useEthers();
   const history = useHistory();
-  const { getIdeas, voteOnIdeaList } = useIdeas();
+  const { getIdeas, voteOnIdeaList, setSortBy } = useIdeas();
 
   const ideas = getIdeas();
+
+  const handleSortChange = (e: any) => {
+    setSortBy(e.target.value);
+  };
 
   const connectedAccountNounVotes = useUserVotes() || 0;
 
@@ -32,20 +36,30 @@ const Ideas = () => {
     <div>
       <div>
         <h3 className={classes.heading}>Ideas</h3>
-        {account !== undefined && hasNouns ? (
-          <div className={classes.submitIdeaButtonWrapper}>
+        <div className={clsx('d-flex', classes.submitIdeaButtonWrapper)}>
+          <div className={classes.sortFilter}>
+            <span className={classes.sortLabel}>Sort By:</span>
+            <Form.Select aria-label="Order by" onChange={handleSortChange}>
+              {Object.keys(SORT_BY).map(k => (
+                <option value={k} key={k}>
+                  {SORT_BY[k]}
+                </option>
+              ))}
+            </Form.Select>
+          </div>
+          {account !== undefined && hasNouns ? (
             <Button className={classes.generateBtn} onClick={() => history.push('/ideas/create')}>
               Submit Idea
             </Button>
-          </div>
-        ) : (
-          <div className={clsx('d-flex', classes.submitIdeaButtonWrapper)}>
-            {!isMobile && <div className={classes.nullStateCopy}>{nullStateCopy()}</div>}
-            <div className={classes.nullBtnWrapper}>
-              <Button className={classes.generateBtnDisabled}>Submit Idea</Button>
-            </div>
-          </div>
-        )}
+          ) : (
+            <>
+              {!isMobile && <div className={classes.nullStateCopy}>{nullStateCopy()}</div>}
+              <div className={classes.nullBtnWrapper}>
+                <Button className={classes.generateBtnDisabled}>Submit Idea</Button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
       {isMobile && <div className={classes.nullStateCopy}>{nullStateCopy()}</div>}
       {ideas?.length ? (
