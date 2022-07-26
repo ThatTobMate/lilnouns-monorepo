@@ -36,8 +36,7 @@ export const createNetworkHttpUrl = (network: string): string => {
     return custom || `https://${network}.infura.io/v3/${INFURA_PROJECT_ID}`;
   } else {
     // return custom || `https://eth-mainnet.alchemyapi.io/v2/tEAmLPls4-IajaZM2nyTIfG6CqK_uAb0`;
-    // return custom || `https://eth-mainnet.alchemyapi.io/v2/${INFURA_PROJECT_ID}`;
-    return "https://mainnet.infura.io/v3/ad6e907edc6b43db82302cb69cf4acc3"
+    return 'https://mainnet.infura.io/v3/a84f8e914af74a9d92c9e6e78acecc54';
   }
 };
 
