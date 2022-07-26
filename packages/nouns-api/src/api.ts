@@ -55,6 +55,7 @@ export const createAPI = (): Express => {
     cors({
       origin: [
         'https://lambent-melba-6dd07a.netlify.app',
+        'https://eloquent-sunshine-5116fa.netlify.app',
         'https://lilnouns.wtf',
         ...(config.environment === 'development' ? ['http://localhost:3000'] : []),
       ],
