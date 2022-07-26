@@ -22,7 +22,7 @@ interface AppConfig {
 
 type SupportedChains = ChainId.Rinkeby | ChainId.Mainnet | ChainId.Hardhat;
 
-export const CHAIN_ID: SupportedChains = parseInt(process.env.REACT_APP_CHAIN_ID ?? '4');
+export const CHAIN_ID: SupportedChains = parseInt(process.env.REACT_APP_CHAIN_ID ?? '1');
 
 export const ETHERSCAN_API_KEY = process.env.REACT_APP_ETHERSCAN_API_KEY ?? '';
 
@@ -35,7 +35,9 @@ export const createNetworkHttpUrl = (network: string): string => {
   if (network === 'rinkeby') {
     return custom || `https://${network}.infura.io/v3/${INFURA_PROJECT_ID}`;
   } else {
-    return custom || `https://eth-mainnet.alchemyapi.io/v2/tEAmLPls4-IajaZM2nyTIfG6CqK_uAb0`;
+    // return custom || `https://eth-mainnet.alchemyapi.io/v2/tEAmLPls4-IajaZM2nyTIfG6CqK_uAb0`;
+    // return custom || `https://eth-mainnet.alchemyapi.io/v2/${INFURA_PROJECT_ID}`;
+    return "https://mainnet.infura.io/v3/ad6e907edc6b43db82302cb69cf4acc3"
   }
 };
 
