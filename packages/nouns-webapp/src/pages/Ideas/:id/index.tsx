@@ -20,6 +20,7 @@ import moment from 'moment';
 import Davatar from '@davatar/react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { createBreakpoint } from 'react-use';
 
 const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
@@ -34,6 +35,69 @@ renderer.link = (href, title, text) => {
 marked.setOptions({
   renderer: renderer,
 });
+
+const useBreakpoint = createBreakpoint({ XL: 1440, L: 940, M: 650, S: 540 });
+
+const CommentInput = ({
+  value,
+  setValue,
+  hasNouns,
+  hideInput = undefined,
+  onSubmit,
+}: {
+  value: string;
+  setValue: (val: string) => void;
+  hasNouns: boolean;
+  hideInput?: (val: boolean) => void;
+  onSubmit: () => void;
+}) => {
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'S';
+  const canHideInput = typeof hideInput === 'function';
+
+  return (
+    <div className="relative mt-4">
+      <FormControl
+        as="textarea"
+        placeholder="Type your commment..."
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        className={`border rounded-lg w-full pt-3 pb-3 pl-3 ${
+          canHideInput && !isMobile ? '!pr-[162px]' : '!pr-[90px]'
+        } relative`}
+      />
+      <div
+        className={`absolute right-2 bottom-[10px] ${
+          isMobile ? 'flex align-items-center flex-column-reverse' : ''
+        }`}
+      >
+        {canHideInput && (
+          <span
+            className={`font-bold text-[#8C8D92] cursor-pointer ${isMobile ? '!pt-[8px]' : 'mr-4'}`}
+            onClick={() => hideInput(true)}
+          >
+            Cancel
+          </span>
+        )}
+
+        <Button
+          className={`${
+            hasNouns
+              ? 'rounded-lg !bg-[#2B83F6] !text-white !font-bold'
+              : '!text-[#8C8D92] !bg-[#F4F4F8] !border-[#E2E3E8]-1 !font-bold'
+          } p-1 rounded`}
+          onClick={() => {
+            if (hasNouns && value.length > 0) {
+              onSubmit();
+            }
+          }}
+        >
+          Comment
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 const Comment = ({
   comment,
@@ -109,37 +173,13 @@ const Comment = ({
       )}
 
       {isReply && (
-        <div className="relative my-4">
-          <input
-            value={reply}
-            onChange={e => setReply(e.target.value)}
-            type="text"
-            className="border rounded-lg w-full p-3 relative"
-            placeholder="Type your commment..."
-          />
-          <div className="absolute right-2 top-2">
-            <span
-              className="mr-4 font-bold text-[#8C8D92] cursor-pointer"
-              onClick={() => setIsReply(false)}
-            >
-              Cancel
-            </span>
-            <button
-              className={`${
-                hasNouns
-                  ? 'rounded-lg bg-[#2B83F6] text-white font-bold'
-                  : 'text-[#8C8D92] bg-[#F4F4F8] border-[#E2E3E8]-1 font-bold'
-              } p-2 rounded`}
-              onClick={() => {
-                if (hasNouns) {
-                  submitReply();
-                }
-              }}
-            >
-              Comment
-            </button>
-          </div>
-        </div>
+        <CommentInput
+          value={reply}
+          setValue={setReply}
+          hideInput={(isHidden: boolean) => setIsReply(!isHidden)}
+          hasNouns={hasNouns}
+          onSubmit={submitReply}
+        />
       )}
     </div>
   );
@@ -153,7 +193,7 @@ const IdeaPage = () => {
   const { comments, error } = getComments(id);
   const idea = getIdea(id);
 
-  const [comment, setComment] = useState<string>();
+  const [comment, setComment] = useState<string>('');
   const nounBalance = useNounTokenBalance(account || undefined) ?? 0;
   const ens = useReverseENSLookUp(idea?.creatorId);
   const shortAddress = useShortAddress(idea?.creatorId);
@@ -240,31 +280,12 @@ const IdeaPage = () => {
           </div>
         ) : (
           <>
-            <div className="relative mt-4">
-              <FormControl
-                as="textarea"
-                placeholder="Type your commment..."
-                value={comment}
-                onChange={e => setComment(e.target.value)}
-                className="border rounded-lg w-full p-3 !pr-[90px] relative"
-              />
-              <div className="absolute right-2 bottom-[10px]">
-                <Button
-                  className={`${
-                    hasNouns
-                      ? 'rounded-lg bg-[#2B83F6] text-white font-bold'
-                      : 'text-[#8C8D92] bg-[#F4F4F8] border-[#E2E3E8]-1 font-bold'
-                  } p-1 rounded`}
-                  onClick={() => {
-                    if (hasNouns) {
-                      submitComment();
-                    }
-                  }}
-                >
-                  Comment
-                </Button>
-              </div>
-            </div>
+            <CommentInput
+              value={comment}
+              setValue={setComment}
+              hasNouns={hasNouns}
+              onSubmit={submitComment}
+            />
             <div className="mt-12 space-y-8">
               {comments?.map(comment => {
                 return (
