@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, FormControl, Row } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 import { useEthers } from '@usedapp/core';
 import Section from '../../../layout/Section';
@@ -85,7 +85,7 @@ const Comment = ({
         {/* Future addition: Add view more button to move deeper into the thread? */}
       </div>
 
-      <p className="text-[#212529] text-lg">{comment.body}</p>
+      <p className="text-[#212529] text-lg whitespace-pre-wrap">{comment.body}</p>
 
       {!!comment.replies?.length && level === 1 && (
         <span
@@ -241,20 +241,20 @@ const IdeaPage = () => {
         ) : (
           <>
             <div className="relative mt-4">
-              <input
+              <FormControl
+                as="textarea"
+                placeholder="Type your commment..."
                 value={comment}
                 onChange={e => setComment(e.target.value)}
-                type="text"
-                className="border rounded-lg w-full p-3 relative"
-                placeholder="Type your commment..."
+                className="border rounded-lg w-full p-3 !pr-[90px] relative"
               />
-              <div className="absolute right-2 top-2">
-                <button
+              <div className="absolute right-2 bottom-[10px]">
+                <Button
                   className={`${
                     hasNouns
                       ? 'rounded-lg bg-[#2B83F6] text-white font-bold'
                       : 'text-[#8C8D92] bg-[#F4F4F8] border-[#E2E3E8]-1 font-bold'
-                  } p-2 rounded`}
+                  } p-1 rounded`}
                   onClick={() => {
                     if (hasNouns) {
                       submitComment();
@@ -262,7 +262,7 @@ const IdeaPage = () => {
                   }}
                 >
                   Comment
-                </button>
+                </Button>
               </div>
             </div>
             <div className="mt-12 space-y-8">
