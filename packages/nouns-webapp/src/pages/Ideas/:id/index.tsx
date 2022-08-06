@@ -149,21 +149,18 @@ const IdeaPage = () => {
   const { id } = useParams() as { id: string };
   const history = useHistory();
   const { account } = useEthers();
+  const { getIdea, getComments, commentOnIdea, voteOnIdea } = useIdeas();
+  const { comments, error } = getComments(id);
+  const idea = getIdea(id);
+
   const [comment, setComment] = useState<string>();
   const nounBalance = useNounTokenBalance(account || undefined) ?? 0;
-
-  const { getIdea, getComments, commentOnIdea, voteOnIdea } = useIdeas();
-
-  const idea = getIdea(id);
-  const { comments, error } = getComments(id);
+  const ens = useReverseENSLookUp(idea?.creatorId);
+  const shortAddress = useShortAddress(idea?.creatorId);
 
   const castVote = async (formData: VoteFormData) => {
     await voteOnIdea(formData);
   };
-
-  if (!idea) {
-    return <div>loading</div>;
-  }
 
   const submitComment = async () => {
     await commentOnIdea({
@@ -174,7 +171,13 @@ const IdeaPage = () => {
     setComment('');
   };
 
+  if (!idea) {
+    return <div>loading</div>;
+  }
+
   const hasNouns = nounBalance > 0;
+  const creatorLilNoun = idea.votes?.find(vote => vote.voterId === idea.creatorId)?.voter
+    ?.lilnounCount;
 
   return (
     <Section fullWidth={false} className={classes.section}>
@@ -219,7 +222,13 @@ const IdeaPage = () => {
           </div>
         </div>
 
-        <div className="mt-12 mb-2">
+        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
+          {`${ens || shortAddress} | ${creatorLilNoun} lil nouns | ${moment(idea.createdAt).format(
+            'MMM Do YYYY',
+          )}`}
+        </div>
+
+        <div className="mt-2 mb-2">
           <h3 className="text-2xl lodrina font-bold">
             {comments?.length} {comments?.length === 1 ? 'comment' : 'comments'}
           </h3>
