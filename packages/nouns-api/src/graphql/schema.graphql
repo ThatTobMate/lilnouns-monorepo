@@ -1,0 +1,76 @@
+type Query {
+  getIdeas(options: IdeaInputOptions!): [Idea!]
+  getAllUsers: [User!]
+  getUser(options: UserInputOptions!): User
+}
+
+type UserStats {
+  votes: Int
+  comments: Int
+  ideas: Int
+}
+
+type User {
+  wallet: String!
+  _count: UserStats
+}
+
+type Vote {
+  id: Int!
+  voterId: String!
+  ideaId: Int!
+  direction: Int!
+  voter: User!
+}
+
+type Reply {
+  id: Int!
+  body: String!
+  ideaId: Int!
+  parentId: Int!
+  authorId: String!
+  replies: [Reply!]
+  createdAt: String!
+}
+
+type Comment {
+  id: Int!
+  body: String!
+  ideaId: Int!
+  parentId: Int
+  authorId: String!
+  replies: [Reply!]
+  createdAt: String!
+}
+
+type IdeaCount {
+  comments: Int
+}
+
+type Idea {
+  id: Int!
+  title: String!
+  tldr: String!
+  description: String!
+  votes: [Vote!]
+  creatorId: String!
+  comments: [Comment!]
+  votecount: Int!
+  createdAt: String!
+  _count: IdeaCount
+}
+
+input IdeaInputOptions {
+  sort: SORT_TYPE!
+}
+
+input UserInputOptions {
+  wallet: String!
+}
+
+enum SORT_TYPE {
+  VOTES_DESC
+  VOTES_ASC
+  LATEST
+  OLDEST
+}
