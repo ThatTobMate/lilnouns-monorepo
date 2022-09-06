@@ -1,6 +1,10 @@
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import express, { Express, Request, Response } from 'express';
+
+import { ApolloServer } from 'apollo-server-express';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+
 import AuthController from './controllers/auth';
 import bodyParser from 'body-parser';
 import IdeasController from './controllers/ideas';
@@ -15,9 +19,8 @@ import Rollbar from 'rollbar';
 export const prisma = new PrismaClient();
 
 import { config } from './config';
-import { ApolloServer } from 'apollo-server-express';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
-import schema from './graphql/schema';
+
+import schema from './graphql/schemasMap';
 
 export const rollbar = new Rollbar({
   accessToken: config.rollbarApiKey,
