@@ -19,17 +19,24 @@
   },
   "scripts": {
     "dev": "npm run generate:prisma && nodemon src/index.ts",
-    "start": "npm run migrate:prisma && node dist/src/index.js",
+    "start": "npm run migrate:prisma && node dist/src/index.js -r graphql-import-node/register",
     "prestart": "npm run build",
     "migrate:prisma": "prisma migrate dev",
     "generate:prisma": "prisma generate",
-    "build": "tsc -p ."
+    "build": "npm run clean && tsc -p . && npm run copy-files",
+    "generate-graphql": "graphql-codegen --config codegen.yml",
+    "clean": "rimraf dist/",
+    "copy-files": "cp -r src/graphql/schemas dist/src/graphql/schemas"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.12.0",
+    "@graphql-codegen/typescript": "2.7.3",
+    "@graphql-codegen/typescript-resolvers": "2.7.3",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.11",
     "@types/sharp": "^0.30.5",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "@graphql-tools/utils": "^8.11.0",
