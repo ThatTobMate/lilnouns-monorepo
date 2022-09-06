@@ -27,25 +27,25 @@ export type Comment = {
 
 export type Idea = {
   __typename?: 'Idea';
-  _count?: Maybe<IdeaCount>;
   comments?: Maybe<Array<Comment>>;
   createdAt: Scalars['String'];
   creatorId: Scalars['String'];
   description: Scalars['String'];
   id: Scalars['Int'];
+  ideaStats?: Maybe<IdeaStats>;
   title: Scalars['String'];
   tldr: Scalars['String'];
   votecount: Scalars['Int'];
   votes?: Maybe<Array<Vote>>;
 };
 
-export type IdeaCount = {
-  __typename?: 'IdeaCount';
-  comments?: Maybe<Scalars['Int']>;
-};
-
 export type IdeaInputOptions = {
   sort: Sort_Type;
+};
+
+export type IdeaStats = {
+  __typename?: 'IdeaStats';
+  comments?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -74,7 +74,7 @@ export enum Sort_Type {
 
 export type User = {
   __typename?: 'User';
-  _count?: Maybe<UserStats>;
+  userStats?: Maybe<UserStats>;
   wallet: Scalars['String'];
 };
 
@@ -84,9 +84,9 @@ export type UserInputOptions = {
 
 export type UserStats = {
   __typename?: 'UserStats';
-  comments?: Maybe<Scalars['Int']>;
-  ideas?: Maybe<Scalars['Int']>;
-  votes?: Maybe<Scalars['Int']>;
+  totalComments?: Maybe<Scalars['Int']>;
+  totalIdeas?: Maybe<Scalars['Int']>;
+  totalVotes?: Maybe<Scalars['Int']>;
 };
 
 export type Vote = {
@@ -170,8 +170,8 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Comment: ResolverTypeWrapper<Comment>;
   Idea: ResolverTypeWrapper<Idea>;
-  IdeaCount: ResolverTypeWrapper<IdeaCount>;
   IdeaInputOptions: IdeaInputOptions;
+  IdeaStats: ResolverTypeWrapper<IdeaStats>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
   SORT_TYPE: Sort_Type;
@@ -187,8 +187,8 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Comment: Comment;
   Idea: Idea;
-  IdeaCount: IdeaCount;
   IdeaInputOptions: IdeaInputOptions;
+  IdeaStats: IdeaStats;
   Int: Scalars['Int'];
   Query: {};
   String: Scalars['String'];
@@ -210,12 +210,12 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type IdeaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Idea'] = ResolversParentTypes['Idea']> = {
-  _count?: Resolver<Maybe<ResolversTypes['IdeaCount']>, ParentType, ContextType>;
   comments?: Resolver<Maybe<Array<ResolversTypes['Comment']>>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   creatorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  ideaStats?: Resolver<Maybe<ResolversTypes['IdeaStats']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tldr?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   votecount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -223,7 +223,7 @@ export type IdeaResolvers<ContextType = any, ParentType extends ResolversParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type IdeaCountResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdeaCount'] = ResolversParentTypes['IdeaCount']> = {
+export type IdeaStatsResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdeaStats'] = ResolversParentTypes['IdeaStats']> = {
   comments?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -235,15 +235,15 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  _count?: Resolver<Maybe<ResolversTypes['UserStats']>, ParentType, ContextType>;
+  userStats?: Resolver<Maybe<ResolversTypes['UserStats']>, ParentType, ContextType>;
   wallet?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserStatsResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserStats'] = ResolversParentTypes['UserStats']> = {
-  comments?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  ideas?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  votes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalComments?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalIdeas?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalVotes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -259,7 +259,7 @@ export type VoteResolvers<ContextType = any, ParentType extends ResolversParentT
 export type Resolvers<ContextType = any> = {
   Comment?: CommentResolvers<ContextType>;
   Idea?: IdeaResolvers<ContextType>;
-  IdeaCount?: IdeaCountResolvers<ContextType>;
+  IdeaStats?: IdeaStatsResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserStats?: UserStatsResolvers<ContextType>;

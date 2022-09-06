@@ -5,14 +5,14 @@ type Query {
 }
 
 type UserStats {
-  votes: Int
-  comments: Int
-  ideas: Int
+  totalVotes: Int
+  totalComments: Int
+  totalIdeas: Int
 }
 
 type User {
   wallet: String!
-  _count: UserStats
+  userStats: UserStats
 }
 
 type Vote {
@@ -33,7 +33,7 @@ type Comment {
   createdAt: String!
 }
 
-type IdeaCount {
+type IdeaStats {
   comments: Int
 }
 
@@ -47,7 +47,7 @@ type Idea {
   comments: [Comment!]
   votecount: Int!
   createdAt: String!
-  _count: IdeaCount
+  ideaStats: IdeaStats
 }
 
 input IdeaInputOptions {

@@ -14,6 +14,15 @@ const resolvers: IResolvers = {
       return users;
     },
   },
+  User: {
+    userStats: (root) => {
+      return {
+        totalVotes: root._count?.votes,
+        totalComments: root._count?.comments,
+        totalIdeas: root._count?.ideas,
+      }
+    },
+  },
 };
 
 export default resolvers;

@@ -10,6 +10,13 @@ const resolvers: IResolvers = {
       return ideas;
     },
   },
+  Idea: {
+    comments: async (root) => {
+        const comments = await IdeasService.getIdeaComments(root.id);
+        return comments;
+    },
+    ideaStats: (root) => root._count,
+  }
 };
 
 export default resolvers;
