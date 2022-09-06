@@ -22,7 +22,7 @@ export type Comment = {
   id: Scalars['Int'];
   ideaId: Scalars['Int'];
   parentId?: Maybe<Scalars['Int']>;
-  replies?: Maybe<Array<Reply>>;
+  replies?: Maybe<Array<Comment>>;
 };
 
 export type Idea = {
@@ -63,17 +63,6 @@ export type QueryGetIdeasArgs = {
 
 export type QueryGetUserArgs = {
   options: UserInputOptions;
-};
-
-export type Reply = {
-  __typename?: 'Reply';
-  authorId: Scalars['String'];
-  body: Scalars['String'];
-  createdAt: Scalars['String'];
-  id: Scalars['Int'];
-  ideaId: Scalars['Int'];
-  parentId: Scalars['Int'];
-  replies?: Maybe<Array<Reply>>;
 };
 
 export enum Sort_Type {
@@ -185,7 +174,6 @@ export type ResolversTypes = {
   IdeaInputOptions: IdeaInputOptions;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Query: ResolverTypeWrapper<{}>;
-  Reply: ResolverTypeWrapper<Reply>;
   SORT_TYPE: Sort_Type;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
@@ -203,7 +191,6 @@ export type ResolversParentTypes = {
   IdeaInputOptions: IdeaInputOptions;
   Int: Scalars['Int'];
   Query: {};
-  Reply: Reply;
   String: Scalars['String'];
   User: User;
   UserInputOptions: UserInputOptions;
@@ -218,7 +205,7 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   ideaId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   parentId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  replies?: Resolver<Maybe<Array<ResolversTypes['Reply']>>, ParentType, ContextType>;
+  replies?: Resolver<Maybe<Array<ResolversTypes['Comment']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -245,17 +232,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getAllUsers?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
   getIdeas?: Resolver<Maybe<Array<ResolversTypes['Idea']>>, ParentType, ContextType, RequireFields<QueryGetIdeasArgs, 'options'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'options'>>;
-};
-
-export type ReplyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Reply'] = ResolversParentTypes['Reply']> = {
-  authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  ideaId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  parentId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  replies?: Resolver<Maybe<Array<ResolversTypes['Reply']>>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -285,7 +261,6 @@ export type Resolvers<ContextType = any> = {
   Idea?: IdeaResolvers<ContextType>;
   IdeaCount?: IdeaCountResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  Reply?: ReplyResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserStats?: UserStatsResolvers<ContextType>;
   Vote?: VoteResolvers<ContextType>;

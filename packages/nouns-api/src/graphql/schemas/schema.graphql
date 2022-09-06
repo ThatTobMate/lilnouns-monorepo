@@ -23,23 +23,13 @@ type Vote {
   voter: User!
 }
 
-type Reply {
-  id: Int!
-  body: String!
-  ideaId: Int!
-  parentId: Int!
-  authorId: String!
-  replies: [Reply!]
-  createdAt: String!
-}
-
 type Comment {
   id: Int!
   body: String!
   ideaId: Int!
   parentId: Int
   authorId: String!
-  replies: [Reply!]
+  replies: [Comment!]
   createdAt: String!
 }
 
