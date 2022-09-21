@@ -18,6 +18,7 @@ import { useAccountVotes } from '../../../wrappers/nounToken';
 import IdeaVoteControls from '../../../components/IdeaVoteControls';
 import moment from 'moment';
 import Davatar from '@davatar/react';
+import Helmet from 'react-helmet';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { createBreakpoint } from 'react-use';
@@ -220,89 +221,110 @@ const IdeaPage = () => {
     ?.lilnounCount;
 
   return (
-    <Section fullWidth={false} className={classes.section}>
-      <Col lg={10} className={classes.wrapper}>
-        <Row className={classes.headerRow}>
-          <div>
-            <span className="cursor-pointer inline-block" onClick={() => history.push('/ideas')}>
-              <FontAwesomeIcon
-                icon={faArrowAltCircleLeft}
-                className={`mr-2 text-2xl cursor-pointer`}
-              />
-              Back
-            </span>
-          </div>
-          <div className="flex flex-row justify-between items-center mb-12">
-            <h1 className="mb-0">{idea.title}</h1>
-            <div className="flex flex-row justify-end">
-              <IdeaVoteControls
-                id={idea.id}
-                voteOnIdea={castVote}
-                nounBalance={nounBalance}
-                voteCount={idea.votecount}
-                votes={idea.votes}
-                withAvatars
+    <>
+      <Helmet>
+        <title>Lil Nouns PropLot</title>
+        <meta property="og:title" content={`${idea.title}`} />
+        <meta property="og:site_name" content="Lil Nouns PropLot" />
+        <meta property="og:description" content={`${idea.tldr}`} />
+        <meta
+          property="og:image"
+          content="https://pbs.twimg.com/media/Fcjl2irWQAIYQjd?format=jpg&name=large"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Prop_Lot" />
+        <meta name="twitter:title" content={`${idea.title}`} />
+        <meta name="twitter:description" content={`${idea.tldr}`} />
+        <meta
+          name="twitter:image"
+          content="https://pbs.twimg.com/media/Fcjl2irWQAIYQjd?format=jpg&name=large"
+        />
+      </Helmet>
+
+      <Section fullWidth={false} className={classes.section}>
+        <Col lg={10} className={classes.wrapper}>
+          <Row className={classes.headerRow}>
+            <div>
+              <span className="cursor-pointer inline-block" onClick={() => history.push('/ideas')}>
+                <FontAwesomeIcon
+                  icon={faArrowAltCircleLeft}
+                  className={`mr-2 text-2xl cursor-pointer`}
+                />
+                Back
+              </span>
+            </div>
+            <div className="flex flex-row justify-between items-center mb-12">
+              <h1 className="mb-0">{idea.title}</h1>
+              <div className="flex flex-row justify-end">
+                <IdeaVoteControls
+                  id={idea.id}
+                  voteOnIdea={castVote}
+                  nounBalance={nounBalance}
+                  voteCount={idea.votecount}
+                  votes={idea.votes}
+                  withAvatars
+                />
+              </div>
+            </div>
+          </Row>
+          <div className="space-y-8">
+            <div className="flex flex-col">
+              <h3 className="lodrina font-bold text-2xl mb-2">tl:dr</h3>
+              <p>{idea.tldr}</p>
+            </div>
+            <div className="flex flex-col">
+              <h3 className="lodrina font-bold text-2xl mb-2">Description</h3>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(marked.parse(idea.description), {
+                    ADD_ATTR: ['target'],
+                  }),
+                }}
               />
             </div>
           </div>
-        </Row>
-        <div className="space-y-8">
-          <div className="flex flex-col">
-            <h3 className="lodrina font-bold text-2xl mb-2">tl:dr</h3>
-            <p>{idea.tldr}</p>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="lodrina font-bold text-2xl mb-2">Description</h3>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(marked.parse(idea.description), {
-                  ADD_ATTR: ['target'],
-                }),
-              }}
-            />
-          </div>
-        </div>
 
-        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
-          {`${ens || shortAddress} | ${
-            creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-          } | ${moment(idea.createdAt).format('MMM Do YYYY')}`}
-        </div>
-
-        <div className="mt-2 mb-2">
-          <h3 className="text-2xl lodrina font-bold">
-            {comments?.length} {comments?.length === 1 ? 'comment' : 'comments'}
-          </h3>
-        </div>
-
-        {error ? (
-          <div className="mt-12 mb-2">
-            <h3 className="text-2xl lodrina font-bold">Failed to load commments</h3>
+          <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
+            {`${ens || shortAddress} | ${
+              creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
+            } | ${moment(idea.createdAt).format('MMM Do YYYY')}`}
           </div>
-        ) : (
-          <>
-            <CommentInput
-              value={comment}
-              setValue={setComment}
-              hasNouns={hasNouns}
-              onSubmit={submitComment}
-            />
-            <div className="mt-12 space-y-8">
-              {comments?.map(comment => {
-                return (
-                  <Comment
-                    comment={comment}
-                    key={`comment-${comment.id}`}
-                    hasNouns={hasNouns}
-                    level={1}
-                  />
-                );
-              })}
+
+          <div className="mt-2 mb-2">
+            <h3 className="text-2xl lodrina font-bold">
+              {comments?.length} {comments?.length === 1 ? 'comment' : 'comments'}
+            </h3>
+          </div>
+
+          {error ? (
+            <div className="mt-12 mb-2">
+              <h3 className="text-2xl lodrina font-bold">Failed to load commments</h3>
             </div>
-          </>
-        )}
-      </Col>
-    </Section>
+          ) : (
+            <>
+              <CommentInput
+                value={comment}
+                setValue={setComment}
+                hasNouns={hasNouns}
+                onSubmit={submitComment}
+              />
+              <div className="mt-12 space-y-8">
+                {comments?.map(comment => {
+                  return (
+                    <Comment
+                      comment={comment}
+                      key={`comment-${comment.id}`}
+                      hasNouns={hasNouns}
+                      level={1}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </Col>
+      </Section>
+    </>
   );
 };
 
