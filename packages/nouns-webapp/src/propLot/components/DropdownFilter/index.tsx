@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { useEffect, useState, forwardRef } from 'react';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Dropdown } from 'react-bootstrap';
+
 import {
   getPropLot_propLot_tagFilter as TagFilter,
   getPropLot_propLot_tagFilter_options as TagFilterOptions,
@@ -12,6 +12,7 @@ import {
 } from '../../graphql/__generated__/getPropLot';
 
 import { FilterType as FilterTyeEnum } from '../../graphql/__generated__/globalTypes';
+import { Dropdown, Form } from 'react-bootstrap';
 
 type Filter = TagFilter | SortFilter | DateFilter;
 type FilterOptions = TagFilterOptions | SortFilterOptions | DateFilterOptions;
@@ -28,6 +29,31 @@ export const buildSelectedFilters = (filter: Filter) => {
   });
   return selectedParams;
 };
+
+type CustomToggleProps = {
+  children?: React.ReactNode;
+  onClick: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => any;
+};
+
+// The forwardRef is important!!
+// Dropdown needs access to the DOM node in order to position the Menu
+const CustomToggle = forwardRef(
+  ({ children, onClick }: CustomToggleProps, ref: React.Ref<HTMLAnchorElement>) => (
+    <a
+      href=""
+      ref={ref}
+      onClick={e => {
+        e.preventDefault();
+        onClick(e);
+      }}
+      className="btn mr-[8px] !rounded-[10px] bg-white border border-[#e2e3e8] p-0 focus:!bg-[#F4F4F8] focus:!text-[#231F20] !text-[#8C8D92]"
+    >
+      <span className="flex items-center font-semibold text-[16px] normal-case pt-[8px] pb-[8px] pl-[16px] pr-[16px]">
+        {children}
+      </span>
+    </a>
+  ),
+);
 
 const DropdownFilter = ({
   filter,
@@ -65,10 +91,13 @@ const DropdownFilter = ({
   };
 
   return (
-    <Dropdown className="mr-2 flex">
-      <Dropdown.Toggle id="dropdown-custom-components">{filter.label}</Dropdown.Toggle>
+    <Dropdown>
+      <Dropdown.Toggle as={CustomToggle} id={`dropdown-${filter.id}`}>
+        <span className="pr-2">{filter.label}</span>
+        <FontAwesomeIcon icon={faCaretDown} />
+      </Dropdown.Toggle>
 
-      <Dropdown.Menu>
+      <Dropdown.Menu className="!p-[8px] !bg-[#F4F4F8] border border-[#E2E3E8] rounded-[10px]">
         {filter.options.map(opt => {
           const isSelected = selectedFilters.some(selectedFilter => selectedFilter === opt.value);
           return (
@@ -77,10 +106,34 @@ const DropdownFilter = ({
                 evt.preventDefault();
                 handleUpdateFilters(opt, isSelected);
               }}
-              active={isSelected}
               key={opt.id}
+              className={`${
+                isSelected ? 'bg-white border border-[#E2E3E8]' : ''
+              } cursor-pointer active:!bg-white !hover:bg-[#E2E3E8] rounded-[6px] justify-start mb-[2px] mt-[2px] !pt-[8px] !pb-[8px] pl-[16px] pr-[16px]`}
             >
-              {opt.label}
+              <div className="flex items-center">
+                {filter.type === FilterTyeEnum.MULTI_SELECT && (
+                  <Form.Check type="radio" name={opt.value} id={`${opt.id}`} checked={isSelected}>
+                    <Form.Check.Input
+                      type="radio"
+                      name={opt.value}
+                      checked={isSelected}
+                      className={`${
+                        isSelected
+                          ? 'checked:!bg-[#231F20] checked:!border-[#E2E3E8] border-[#231F20]'
+                          : 'border-[#8C8D92]'
+                      } border-solid border-2 mr-2`}
+                    />
+                  </Form.Check>
+                )}
+                <span
+                  className={`${
+                    isSelected ? 'text-[#231F20]' : 'text-[#8C8D92]'
+                  } font-semibold text-[14px]`}
+                >
+                  {opt.label}
+                </span>
+              </div>
             </Dropdown.Item>
           );
         })}
