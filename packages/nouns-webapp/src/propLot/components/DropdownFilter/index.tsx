@@ -1,5 +1,10 @@
 import { useEffect, useState, forwardRef } from 'react';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCaretDown,
+  faArrowUp,
+  faArrowDown,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
@@ -16,6 +21,15 @@ import { Dropdown, Form } from 'react-bootstrap';
 
 type Filter = TagFilter | SortFilter | DateFilter;
 type FilterOptions = TagFilterOptions | SortFilterOptions | DateFilterOptions;
+
+interface IconMap {
+  [key: string]: IconDefinition;
+}
+
+const SUPPORTED_ICONS: IconMap = {
+  ARROW_UP: faArrowUp,
+  ARROW_DOWN: faArrowDown,
+};
 
 /*
   Find and return the preselected filter options from the GraphQL response.
@@ -126,12 +140,22 @@ const DropdownFilter = ({
                     />
                   </Form.Check>
                 )}
-                <span
-                  className={`${
-                    isSelected ? 'text-[#231F20]' : 'text-[#8C8D92]'
-                  } font-semibold text-[14px]`}
-                >
-                  {opt.label}
+                <span className="flex flex-1 items-center justify-between">
+                  <span
+                    className={`${
+                      isSelected ? 'text-[#231F20]' : 'text-[#8C8D92]'
+                    } font-semibold text-[14px]`}
+                  >
+                    {opt.label}
+                  </span>
+                  {SUPPORTED_ICONS[opt.icon || ''] && (
+                    <FontAwesomeIcon
+                      icon={SUPPORTED_ICONS[opt.icon as string]}
+                      className={`${
+                        isSelected ? 'text-[#231F20]' : 'text-[#8C8D92]'
+                      } font-semibold text-[14px]`}
+                    />
+                  )}
                 </span>
               </div>
             </Dropdown.Item>
