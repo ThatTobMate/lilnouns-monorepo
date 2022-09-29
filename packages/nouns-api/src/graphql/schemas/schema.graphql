@@ -42,6 +42,7 @@ type FilterOption {
   selected: Boolean!
   label: String
   value: String!
+  icon: String
 }
 
 type PropLotResponseMetadata {

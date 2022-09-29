@@ -48,6 +48,7 @@ export interface getPropLot_propLot_sortFilter_options {
   label: string | null;
   selected: boolean;
   value: string;
+  icon: string | null;
 }
 
 export interface getPropLot_propLot_sortFilter {
@@ -64,6 +65,7 @@ export interface getPropLot_propLot_dateFilter_options {
   label: string | null;
   selected: boolean;
   value: string;
+  icon: string | null;
 }
 
 export interface getPropLot_propLot_dateFilter {
@@ -80,6 +82,7 @@ export interface getPropLot_propLot_tagFilter_options {
   label: string | null;
   selected: boolean;
   value: string;
+  icon: string | null;
 }
 
 export interface getPropLot_propLot_tagFilter {

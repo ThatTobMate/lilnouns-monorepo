@@ -50,6 +50,7 @@ export const GET_PROPLOT_QUERY = gql`
       label
       selected
       value
+      icon
     }
   }
 `;
