@@ -1,7 +1,7 @@
 import { Button } from 'react-bootstrap';
 import { useEthers } from '@usedapp/core';
 import { useHistory } from 'react-router-dom';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAccountVotes } from '../../wrappers/nounToken';
 import { useIdeas } from '../../hooks/useIdeas';
 import { useQuery } from '@apollo/client';
@@ -19,13 +19,26 @@ const PropLotHome = () => {
   const history = useHistory();
   const { voteOnIdeaList } = useIdeas();
   const uuid = useRef(v4());
+  const currentURLParams = useRef([] as string[]);
+
+  /*
+    Parse the query params from the url on page load and send them as filters in the initial
+    PropLot query.
+  */
+  useEffect(() => {
+    const urlParams = window.location.search;
+    currentURLParams.current = urlParams
+      .substring(1)
+      .split('&')
+      .filter(str => Boolean(str));
+  }, []);
 
   const { loading, error, data, refetch } = useQuery<getPropLot>(GET_PROPLOT_QUERY, {
     context: { clientName: 'PropLot' },
     variables: {
       options: {
         requestUUID: uuid.current,
-        filters: [] as string[],
+        filters: currentURLParams.current,
       },
     },
     client: propLotClient,
@@ -36,6 +49,22 @@ const PropLotHome = () => {
     These can be parsed to update the local state after each request to ensure the client + API are in sync.
   */
   const appliedFilters = data?.propLot?.metadata?.appliedFilters || [];
+
+  /*
+    When we get a successful GraphQL response sync the metadata.appliedFilters from the response
+    to the url. This enables users to share urls to filtered lists or save their state across
+    page refreshes. metadata.appliedFilters is the source of truth for the state of the current filtered
+    list.
+  */
+  useEffect(() => {
+    const urlParams = appliedFilters.join('&');
+    const currentURLParams = window.location.search;
+    const currentRoute = window.location.pathname;
+
+    if (urlParams && urlParams !== currentURLParams) {
+      window.history.pushState('', '', `${currentRoute}?${urlParams}`);
+    }
+  }, [appliedFilters]);
 
   const handleUpdateFilters = (updatedFilters: string[], filterId: string) => {
     /*
