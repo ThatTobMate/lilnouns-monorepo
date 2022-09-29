@@ -74,7 +74,9 @@ model Tag {
 }
 
 enum TagType {
-  HOT
+  SUGGESTION
+  GOVERNANCE
+  COMMUNITY
   REQUEST
-  DISCUSSION
+  OTHER
 }

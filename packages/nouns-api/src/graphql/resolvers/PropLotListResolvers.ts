@@ -54,7 +54,6 @@ const resolvers: IResolvers = {
   },
   PropLotResponse: {
     ideas: async (root): Promise<Idea[]> => {
-      console.log(root);
       const ideas: Idea[] = await IdeasService.all({
         sortBy: parseFilterParam(root.sortParam).value,
         filterBy: root.tagParams.map((tag: string) => parseFilterParam(tag).value),
