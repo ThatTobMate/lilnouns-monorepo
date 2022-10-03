@@ -70,6 +70,7 @@ model Comment {
 model Tag {
   id     Int @id @default(autoincrement())
   type   TagType
+  label  String
   Ideas  Idea[]
 }
 

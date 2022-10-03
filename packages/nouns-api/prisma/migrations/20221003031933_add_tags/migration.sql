@@ -5,6 +5,7 @@ CREATE TYPE "TagType" AS ENUM ('SUGGESTION', 'GOVERNANCE', 'COMMUNITY', 'REQUEST
 CREATE TABLE "Tag" (
     "id" SERIAL NOT NULL,
     "type" "TagType" NOT NULL,
+    "label" TEXT NOT NULL,
 
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );

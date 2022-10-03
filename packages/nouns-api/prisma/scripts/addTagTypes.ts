@@ -10,9 +10,12 @@ async function seed() {
     TagType.GOVERNANCE,
     TagType.COMMUNITY,
   ]) {
+    const lowercaseType = type.toLowerCase();
+    const label = lowercaseType[0].toUpperCase() + lowercaseType.slice(1);
     await prisma.tag.create({
       data: {
         type,
+        label,
       },
     });
   }
