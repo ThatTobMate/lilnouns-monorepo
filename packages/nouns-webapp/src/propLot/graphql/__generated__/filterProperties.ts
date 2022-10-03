@@ -15,6 +15,7 @@ export interface filterProperties_options {
   label: string | null;
   selected: boolean;
   value: string;
+  icon: string | null;
 }
 
 export interface filterProperties {

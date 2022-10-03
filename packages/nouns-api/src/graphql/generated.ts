@@ -27,6 +27,7 @@ export type Comment = {
 
 export type FilterOption = {
   __typename?: 'FilterOption';
+  icon?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   label?: Maybe<Scalars['String']>;
   selected: Scalars['Boolean'];
@@ -287,6 +288,7 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type FilterOptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['FilterOption'] = ResolversParentTypes['FilterOption']> = {
+  icon?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   label?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   selected?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
