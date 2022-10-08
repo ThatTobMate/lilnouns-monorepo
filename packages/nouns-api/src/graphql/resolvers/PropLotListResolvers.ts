@@ -1,7 +1,6 @@
 import { Tag } from '@prisma/client';
 import IdeasService from '../../services/ideas';
 import { prisma } from '../../api';
-
 import { IResolvers } from '@graphql-tools/utils';
 import {
   PropLotResponseMetadataResolvers,
@@ -138,7 +137,6 @@ const resolvers: IResolvers = {
     },
     tagFilter: async (root): Promise<PropLotFilter> => {
       const tags = await prisma.tag.findMany();
-
       // static tag filters are the tags that come from the database
       // contrast with inferred tags (hot, etc)
       const staticTagFilterOptions = tags.map(tag => {
@@ -149,7 +147,6 @@ const resolvers: IResolvers = {
           selected: Boolean(root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, tag.type))),
         };
       });
-
       const tagFilter: PropLotFilter = {
         __typename: 'PropLotFilter',
         id: FILTER_IDS.TAG,
