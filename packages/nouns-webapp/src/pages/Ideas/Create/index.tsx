@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Nav from 'react-bootstrap/Nav';
@@ -132,6 +132,7 @@ const CreateIdeaPage = () => {
             });
           }}
         >
+          <div></div>
           <div className="flex flex-col">
             <div className="flex justify-between w-full items-center">
               <label className="lodrina font-bold text-2xl mb-2">Title</label>
