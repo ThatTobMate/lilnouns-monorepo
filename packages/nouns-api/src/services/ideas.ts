@@ -142,7 +142,7 @@ class IdeasService {
   }
 
   static async createIdea(
-    data: { title: string; tldr: string; description: string },
+    data: { title: string; tldr: string; description: string; tags: TagType[] },
     user?: { wallet: string },
   ) {
     try {
@@ -161,6 +161,14 @@ class IdeasService {
               direction: 1,
               voterId: user.wallet,
             },
+          },
+          tags: {
+            create: data.tags.map(tag => {
+              return {
+                type: tag,
+                label: tag,
+              };
+            }),
           },
         },
       });
