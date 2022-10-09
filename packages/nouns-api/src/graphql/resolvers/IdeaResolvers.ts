@@ -6,7 +6,7 @@ import { QueryGetIdeasArgs, MutationSubmitIdeaVoteArgs, Idea, Vote } from '../ge
 const resolvers: IResolvers = {
   Query: {
     getIdeas: async (_parent: any, args: QueryGetIdeasArgs): Promise<Idea[]> => {
-      const ideas: Idea[] = await IdeasService.all(args.options.sort as string);
+      const ideas: Idea[] = await IdeasService.all({ sortBy: args.options.sort as string });
       return ideas;
     },
   },

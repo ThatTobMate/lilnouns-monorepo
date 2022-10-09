@@ -1,5 +1,6 @@
 import { prisma } from '../api';
 import { DATE_FILTERS } from '../graphql/utils/queryUtils';
+import { TagType } from '@prisma/client';
 
 const sortFn: { [key: string]: any } = {
   LATEST: (a: any, b: any) => {
@@ -26,7 +27,7 @@ const calculateVotes = (votes: any) => {
 };
 
 class IdeasService {
-  static async all(sortBy?: string) {
+  static async all({ sortBy }: { sortBy?: string }) {
     try {
       // Investigate issue with votecount db triggers
 
@@ -73,13 +74,23 @@ class IdeasService {
     date,
   }: {
     sortBy?: string;
-    tags?: string[];
+    tags?: TagType[];
     date?: string;
   }) {
     try {
       const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn();
       const ideas = await prisma.idea.findMany({
         where: {
+          ...(tags &&
+            tags.length > 0 && {
+              tags: {
+                some: {
+                  type: {
+                    in: tags,
+                  },
+                },
+              },
+            }),
           createdAt: {
             gte: dateRange.gte,
             lte: dateRange.lte,

@@ -1,6 +1,6 @@
-import IdeasService from '../../services/ideas';
-
 import { IResolvers } from '@graphql-tools/utils';
+import { prisma } from '../../api';
+import IdeasService from '../../services/ideas';
 import {
   PropLotResponseMetadataResolvers,
   QueryGetPropLotArgs,
@@ -42,7 +42,7 @@ const resolvers: IResolvers = {
       const ideas: Idea[] = await IdeasService.findWhere({
         sortBy: parseFilterParam(root.sortParam)?.value,
         date: parseFilterParam(root.dateParam)?.value,
-        // Add tags here
+        tags: root.tagParams.map((tag: string) => parseFilterParam(tag)?.value),
       });
 
       return ideas;
@@ -112,14 +112,25 @@ const resolvers: IResolvers = {
 
       return dateFilter;
     },
-    tagFilter: (root): PropLotFilter => {
-      // Load tags from DB and build the filters here
+    tagFilter: async (root): Promise<PropLotFilter> => {
+      const tags = await prisma.tag.findMany();
+      // static tag filters are the tags that come from the database
+      // contrast with inferred tags (hot, etc)
+      const staticTagFilterOptions = tags.map(tag => {
+        return {
+          id: `${FILTER_IDS.TAG}-${tag.type}`,
+          label: tag.label,
+          value: buildFilterParam(FILTER_IDS.TAG, tag.type),
+          selected: Boolean(root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, tag.type))),
+        };
+      });
       const tagFilter: PropLotFilter = {
         __typename: 'PropLotFilter',
         id: FILTER_IDS.TAG,
         type: FilterType.MultiSelect,
         label: 'Tags',
         options: [
+          ...staticTagFilterOptions,
           {
             id: `${FILTER_IDS.TAG}-HOT`,
             selected: Boolean(root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, 'HOT'))),
