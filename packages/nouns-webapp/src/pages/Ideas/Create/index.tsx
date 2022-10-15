@@ -122,7 +122,7 @@ const CreateIdeaPage = () => {
             event.preventDefault();
             const target = event.target as HTMLFormElement; // quiets TS
             const data = new FormData(target);
-            const tags = data.getAll('tags');
+            const tags = data.getAll('tags') as string[];
 
             if (!formValid) {
               return;
@@ -139,23 +139,23 @@ const CreateIdeaPage = () => {
           <div className="flex flex-row space-x-4">
             <div className="flex flex-col items-start">
               <label>Suggestion</label>
-              <input type="checkbox" name="tags" value="suggestion" />
+              <input type="checkbox" name="tags" value="SUGGESTION" />
             </div>
             <div className="flex flex-col items-start">
               <label>Governance</label>
-              <input type="checkbox" name="tags" value="governance" />
+              <input type="checkbox" name="tags" value="GOVERNANCE" />
             </div>
             <div className="flex flex-col items-start">
               <label>Community</label>
-              <input type="checkbox" name="tags" value="community" />
+              <input type="checkbox" name="tags" value="COMMUNITY" />
             </div>
             <div className="flex flex-col items-start">
               <label>Request</label>
-              <input type="checkbox" name="tags" value="request" />
+              <input type="checkbox" name="tags" value="REQUEST" />
             </div>
             <div className="flex flex-col items-start">
               <label>Other</label>
-              <input type="checkbox" name="tags" value="other" />
+              <input type="checkbox" name="tags" value="OTHER" />
             </div>
           </div>
           <div className="flex flex-col">

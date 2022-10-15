@@ -170,12 +170,9 @@ class IdeasService {
             },
           },
           tags: {
-            create: data.tags.map(tag => {
-              const lowercaseType = tag.toLowerCase();
-              const label = lowercaseType[0].toUpperCase() + lowercaseType.slice(1);
+            connect: data.tags.map(tag => {
               return {
                 type: tag,
-                label,
               };
             }),
           },
