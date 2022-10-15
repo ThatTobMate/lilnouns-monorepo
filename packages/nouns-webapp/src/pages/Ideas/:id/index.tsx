@@ -3,7 +3,6 @@ import { Button, Col, FormControl, Row } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 import { useEthers } from '@usedapp/core';
 import Section from '../../../layout/Section';
-import classes from '../Ideas.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { useReverseENSLookUp } from '../../../utils/ensLookup';
@@ -220,30 +219,46 @@ const IdeaPage = () => {
     ?.lilnounCount;
 
   return (
-    <Section fullWidth={false} className={classes.section}>
-      <Col lg={10} className={classes.wrapper}>
-        <Row className={classes.headerRow}>
+    <Section fullWidth={false}>
+      <Col lg={10} className="mx-auto">
+        <Row>
           <div>
-            <span className="cursor-pointer inline-block" onClick={() => history.push('/ideas')}>
+            <span
+              className="cursor-pointer text-[#8C8D92] flex flex-row items-center"
+              onClick={() => history.push('/ideas')}
+            >
               <FontAwesomeIcon
                 icon={faArrowAltCircleLeft}
                 className={`mr-2 text-2xl cursor-pointer`}
               />
-              Back
+              <span className="text-lg lodrina">Back</span>
             </span>
           </div>
-          <div className="flex flex-row justify-between items-center mb-12">
-            <h1 className="mb-0">{idea.title}</h1>
-            <div className="flex flex-row justify-end">
-              <IdeaVoteControls
-                id={idea.id}
-                voteOnIdea={castVote}
-                nounBalance={nounBalance}
-                voteCount={idea.votecount}
-                votes={idea.votes}
-                withAvatars
-              />
+          <div className="flex flex-col mb-12">
+            <div className="flex flex-row justify-between items-center">
+              <h1 className="mb-0 lodrina">{idea.title}</h1>
+              <div className="flex flex-row justify-end">
+                <IdeaVoteControls
+                  id={idea.id}
+                  voteOnIdea={castVote}
+                  nounBalance={nounBalance}
+                  voteCount={idea.votecount}
+                  votes={idea.votes}
+                  withAvatars
+                />
+              </div>
             </div>
+            {idea.tags.length > 0 && (
+              <div className="flex flex-row space-x-2 mt-4">
+                {idea.tags.map(tag => {
+                  return (
+                    <span className="text-blue-500 bg-blue-200 text-xs font-bold rounded-full px-2 py-0.5 inline">
+                      {tag.label}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </Row>
         <div className="space-y-8">

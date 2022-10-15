@@ -31,11 +31,17 @@ export interface Vote {
   };
 }
 
+export interface Tag {
+  label: string;
+  type: string;
+}
+
 export interface Idea {
   id: number;
   title: string;
   tldr: string;
   description: string;
+  tags?: Tag[];
   votes?: Vote[];
   creatorId: string;
   comments?: Comment[];

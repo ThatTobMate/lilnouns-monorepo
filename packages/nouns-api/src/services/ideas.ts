@@ -129,6 +129,7 @@ class IdeasService {
           id,
         },
         include: {
+          tags: true,
           votes: {
             include: {
               voter: true,
