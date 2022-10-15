@@ -44,6 +44,10 @@ const PropLotHome = () => {
     client: propLotClient,
   });
 
+  console.log('loading', loading);
+  console.log('error', error);
+  console.log(data);
+
   /*
     Filters that are applied to the current response.
     These can be parsed to update the local state after each request to ensure the client + API are in sync.
