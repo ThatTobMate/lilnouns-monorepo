@@ -18,7 +18,17 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
   const breakpoint = useBreakpoint();
   const history = useHistory();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { id, tldr, title, creatorId, votecount: voteCount, votes, createdAt, ideaStats } = idea;
+  const {
+    id,
+    tldr,
+    title,
+    creatorId,
+    votecount: voteCount,
+    votes,
+    createdAt,
+    ideaStats,
+    tags,
+  } = idea;
   const isMobile = breakpoint === 'S';
 
   const ens = useReverseENSLookUp(creatorId);
@@ -46,16 +56,44 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
       <div className="flex flex-row flex-1 justify-content-start align-items-center">
         <span className="text-[#212529] font-normal text-2xl flex flex-1 lodrina">{title}</span>
       </div>
+      {tags.length > 0 && (
+        <div className="flex flex-row space-x-2 mt-4">
+          {tags.map(tag => {
+            return (
+              <span className="text-blue-500 bg-blue-200 text-xs font-bold rounded-full px-2 py-0.5 inline">
+                {tag.label}
+              </span>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 
   const desktopHeading = (
     <div className="flex flex-row flex-1 justify-content-start align-items-center">
-      <span className="font-normal lodrina flex text-2xl text-[#8C8D92] overflow-hidden">
-        <span className="mr-4">{id}</span>
-        <span className="truncate">{ens || shortAddress}</span>
-      </span>
-      <span className="text-[#212529] font-normal text-2xl flex flex-1 lodrina ml-6">{title}</span>
+      <div className="flex flex-1 flex-col">
+        <div className="flex flex-1">
+          <span className="font-normal lodrina flex text-2xl text-[#8C8D92] overflow-hidden">
+            <span className="mr-4">{id}</span>
+            <span className="truncate">{ens || shortAddress}</span>
+          </span>
+          <span className="text-[#212529] font-normal text-2xl flex flex-1 lodrina ml-6">
+            {title}
+          </span>
+        </div>
+        {tags.length > 0 && (
+          <div className="flex flex-row space-x-2 mt-2">
+            {tags.map(tag => {
+              return (
+                <span className="text-blue-500 bg-blue-200 text-xs font-bold rounded-full px-2 py-0.5 inline">
+                  {tag.label}
+                </span>
+              );
+            })}
+          </div>
+        )}
+      </div>
       <div className="flex justify-self-end">
         <IdeaVoteControls
           id={id}
@@ -71,13 +109,13 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
 
   return (
     <div
-      className="flex flex-col border border-[#e2e3e8] rounded-lg cursor-pointer pt-2 px-3 pb-2"
+      className="flex flex-col border border-[#e2e3e8] rounded-lg cursor-pointer p-3"
       onClick={() => setIsOpen(!isOpen)}
     >
       {isMobile ? mobileHeading : desktopHeading}
       {isOpen && (
         <>
-          <div className="flex flex-row flex-1 justify-content-start align-items-center pt-2 pb-2">
+          <div className="mt-2 flex flex-row flex-1 justify-content-start align-items-center pt-2 pb-2">
             <span
               className="border border-[#e2e3e8] bg-[#f4f4f8] p-4 rounded-lg flex-1"
               dangerouslySetInnerHTML={{ __html: tldr }}

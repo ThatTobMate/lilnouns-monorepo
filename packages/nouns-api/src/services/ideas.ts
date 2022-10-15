@@ -97,6 +97,7 @@ class IdeasService {
           },
         },
         include: {
+          tags: true,
           votes: {
             include: {
               voter: true,
