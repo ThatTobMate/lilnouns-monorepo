@@ -42,7 +42,6 @@ const resolvers: IResolvers = {
       const ideas: Idea[] = await IdeasService.findWhere({
         sortBy: parseFilterParam(root.sortParam)?.value,
         date: parseFilterParam(root.dateParam)?.value,
-        timeZone: root.timeZone,
         // Add tags here
       });
 

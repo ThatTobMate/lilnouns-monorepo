@@ -1,4 +1,4 @@
-import moment from 'moment-timezone';
+import moment from 'moment';
 
 export const FILTER_IDS = {
   DATE: 'date',
@@ -33,33 +33,33 @@ export const DATE_FILTERS: { [key: string]: any } = {
   TODAY: {
     value: buildFilterParam(FILTER_IDS.DATE, 'TODAY'),
     displayName: 'Today',
-    filterFn: (tz: string) => ({
-      gte: moment().startOf('day').tz(tz).toISOString(),
-      lte: moment().endOf('day').tz(tz).toISOString(),
+    filterFn: () => ({
+      gte: moment().startOf('day').toISOString(),
+      lte: moment().endOf('day').toISOString(),
     }),
   },
   THIS_WEEK: {
     value: buildFilterParam(FILTER_IDS.DATE, 'THIS_WEEK'),
     displayName: 'This week',
-    filterFn: (tz: string) => ({
-      gte: moment().startOf('week').tz(tz).toISOString(),
-      lte: moment().endOf('week').tz(tz).toISOString(),
+    filterFn: () => ({
+      gte: moment().startOf('week').toISOString(),
+      lte: moment().endOf('week').toISOString(),
     }),
   },
   THIS_MONTH: {
     value: buildFilterParam(FILTER_IDS.DATE, 'THIS_MONTH'),
     displayName: 'This month',
-    filterFn: (tz: string) => ({
-      gte: moment().startOf('month').tz(tz).toISOString(),
-      lte: moment().endOf('month').tz(tz).toISOString(),
+    filterFn: () => ({
+      gte: moment().startOf('month').toISOString(),
+      lte: moment().endOf('month').toISOString(),
     }),
   },
   ALL_TIME: {
     value: buildFilterParam(FILTER_IDS.DATE, 'ALL_TIME'),
     displayName: 'All time',
-    filterFn: (tz: string) => ({
-      gte: moment(new Date('2022-01-01')).tz(tz).toISOString(),
-      lte: moment().endOf('day').tz(tz).toISOString(),
+    filterFn: () => ({
+      gte: moment(new Date('2022-01-01')).toISOString(),
+      lte: moment().endOf('day').toISOString(),
     }),
   },
 };

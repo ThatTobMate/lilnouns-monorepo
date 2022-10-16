@@ -71,15 +71,13 @@ class IdeasService {
     sortBy,
     tags,
     date,
-    timeZone,
   }: {
     sortBy?: string;
     tags?: string[];
     date?: string;
-    timeZone: string;
   }) {
     try {
-      const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn(timeZone);
+      const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn();
       const ideas = await prisma.idea.findMany({
         where: {
           createdAt: {
