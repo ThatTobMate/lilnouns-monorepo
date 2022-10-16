@@ -1,4 +1,3 @@
-import { Tag } from '@prisma/client';
 import { IResolvers } from '@graphql-tools/utils';
 import { prisma } from '../../api';
 import IdeasService from '../../services/ideas';
