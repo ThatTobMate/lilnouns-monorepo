@@ -9,6 +9,8 @@ import {
   FilterType,
 } from '../generated';
 
+import { VirtualTags } from '../../virtual';
+
 const FILTER_IDS = {
   DATE: 'date',
   SORT: 'sort',
@@ -137,7 +139,7 @@ const resolvers: IResolvers = {
     tagFilter: async (root): Promise<PropLotFilter> => {
       const tags = await prisma.tag.findMany();
       // static tag filters are the tags that come from the database
-      // contrast with inferred tags (hot, etc)
+      // contrast with virtual tags (hot, etc)
       const staticTagFilterOptions = tags.map(tag => {
         return {
           id: `${FILTER_IDS.TAG}-${tag.type}`,
@@ -146,28 +148,23 @@ const resolvers: IResolvers = {
           selected: Boolean(root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, tag.type))),
         };
       });
+
+      const virtualTagFilterOptions = Object.keys(VirtualTags).map(key => {
+        // @ts-ignore
+        const vT = VirtualTags[key];
+        return {
+          id: `${FILTER_IDS.TAG}-${vT.type}`,
+          label: vT.label,
+          value: buildFilterParam(FILTER_IDS.TAG, vT.type),
+          selected: Boolean(root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, vT.type))),
+        };
+      });
       const tagFilter: PropLotFilter = {
         __typename: 'PropLotFilter',
         id: FILTER_IDS.TAG,
         type: FilterType.MultiSelect,
         label: 'Tags',
-        options: [
-          ...staticTagFilterOptions,
-          {
-            id: `${FILTER_IDS.TAG}-HOT`,
-            selected: Boolean(root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, 'HOT'))),
-            label: 'Hot',
-            value: buildFilterParam(FILTER_IDS.TAG, 'HOT'),
-          },
-          {
-            id: `${FILTER_IDS.TAG}-DISCUSSION`,
-            selected: Boolean(
-              root.tagParams?.includes(buildFilterParam(FILTER_IDS.TAG, 'DISCUSSION')),
-            ),
-            label: 'Discussion',
-            value: buildFilterParam(FILTER_IDS.TAG, 'DISCUSSION'),
-          },
-        ],
+        options: [...staticTagFilterOptions, ...virtualTagFilterOptions],
       };
 
       return tagFilter;
