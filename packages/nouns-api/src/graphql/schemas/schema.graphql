@@ -113,6 +113,8 @@ type Idea {
   createdAt: String!
   ideaStats: IdeaStats
   tags: [IdeaTags!]
+  archived: Boolean!
+  consensus: Float
 }
 
 # Enums

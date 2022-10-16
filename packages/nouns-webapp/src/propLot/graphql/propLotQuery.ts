@@ -14,6 +14,8 @@ export const GET_PROPLOT_QUERY = gql`
         ideaStats {
           comments
         }
+        archived
+        consensus
         tags {
           type
           label
