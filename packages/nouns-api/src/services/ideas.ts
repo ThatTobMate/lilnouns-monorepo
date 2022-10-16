@@ -1,7 +1,8 @@
+import { Idea, TagType } from '@prisma/client';
 import { prisma } from '../api';
-import { DATE_FILTERS } from '../graphql/utils/queryUtils';
-import { TagType, Idea } from '@prisma/client';
+import { DATE_FILTERS, getIsArchived } from '../graphql/utils/queryUtils';
 import { VirtualTags } from '../virtual';
+import { nounsTotalSupply } from '../utils/utils';
 
 const sortFn: { [key: string]: any } = {
   LATEST: (a: any, b: any) => {
@@ -26,6 +27,11 @@ const calculateVotes = (votes: any) => {
 
   return count;
 };
+
+const calculateConsensus = (idea: Idea, totalSupply: number) =>{
+  const consensus = (idea.votecount / totalSupply) * 100;
+  return Math.min(Math.max(Number(consensus.toPrecision(2)), 0), 100);
+}
 
 class IdeasService {
   static async all({ sortBy }: { sortBy?: string }) {
@@ -59,7 +65,9 @@ class IdeasService {
       const ideaData = ideas
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
-          return { ...idea, votecount };
+          const archived = getIsArchived(idea);
+
+          return { ...idea, votecount, archived };
         })
         .sort(sortFn[sortBy || 'LATEST']);
 
@@ -100,10 +108,16 @@ class IdeasService {
         },
       });
 
+      // Can we get the total supply at a specific date/block?
+      const totalSupply = await nounsTotalSupply();
+
       const ideaData = ideas
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
-          return { ...idea, votecount };
+          const consensus = calculateConsensus(idea, totalSupply);
+          const archived = getIsArchived(idea);
+
+          return { ...idea, votecount, consensus, archived };
         })
         .filter((idea: any) => {
           if (!tags || tags.length === 0) {
@@ -145,7 +159,12 @@ class IdeasService {
         throw new Error('Idea not found');
       }
 
-      const ideaData = { ...idea, votecount: calculateVotes(idea.votes) };
+      const totalSupply = await nounsTotalSupply();
+
+      const consensus = calculateConsensus(idea, totalSupply);
+      const archived = getIsArchived(idea);
+
+      const ideaData = { ...idea, archived, consensus, votecount: calculateVotes(idea.votes) };
 
       return ideaData;
     } catch (e: any) {
@@ -184,7 +203,7 @@ class IdeasService {
         },
       });
 
-      return idea;
+      return { ...idea, archived: false };
     } catch (e) {
       throw e;
     }
