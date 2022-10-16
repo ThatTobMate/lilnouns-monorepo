@@ -2,6 +2,7 @@ import IdeasService from '../../services/ideas';
 
 import { IResolvers } from '@graphql-tools/utils';
 import { QueryGetIdeasArgs, MutationSubmitIdeaVoteArgs, Idea, Vote } from '../generated';
+import { VirtualTags } from '../../virtual';
 
 const resolvers: IResolvers = {
   Query: {
@@ -31,6 +32,17 @@ const resolvers: IResolvers = {
     },
   },
   Idea: {
+    tags: async root => {
+      const tags = root.tags;
+      const matchingVirtualTags = Object.keys(VirtualTags)
+        .filter(key => {
+          const vT = VirtualTags[key];
+          return vT.filterFn(root);
+        })
+        .map(key => VirtualTags[key]);
+
+      return [...tags, ...matchingVirtualTags];
+    },
     comments: async root => {
       const comments = await IdeasService.getIdeaComments(root.id);
       return comments;
