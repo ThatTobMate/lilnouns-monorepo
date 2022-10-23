@@ -1,6 +1,6 @@
 import { prisma } from '../api';
 import { DATE_FILTERS } from '../graphql/utils/queryUtils';
-import { TagType } from '@prisma/client';
+import { TagType, Idea } from '@prisma/client';
 import { VirtualTags } from '../virtual';
 
 const sortFn: { [key: string]: any } = {

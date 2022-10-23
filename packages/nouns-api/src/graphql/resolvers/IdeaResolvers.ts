@@ -1,11 +1,21 @@
 import IdeasService from '../../services/ideas';
 
 import { IResolvers } from '@graphql-tools/utils';
-import { QueryGetIdeasArgs, MutationSubmitIdeaVoteArgs, Idea, Vote } from '../generated';
+import {
+  QueryGetIdeaArgs,
+  QueryGetIdeasArgs,
+  MutationSubmitIdeaVoteArgs,
+  Idea,
+  Vote,
+} from '../generated';
 import { VirtualTags } from '../../virtual';
 
 const resolvers: IResolvers = {
   Query: {
+    getIdea: async (_parent: any, args: QueryGetIdeaArgs) => {
+      const idea = await IdeasService.get(args.options.ideaId as number);
+      return idea;
+    },
     getIdeas: async (_parent: any, args: QueryGetIdeasArgs): Promise<Idea[]> => {
       const ideas: Idea[] = await IdeasService.all({ sortBy: args.options.sort as string });
       return ideas;

@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { useReverseENSLookUp } from '../../../utils/ensLookup';
 import { useShortAddress } from '../../../utils/addressAndENSDisplayUtils';
-
 import moment from 'moment';
 import { createBreakpoint } from 'react-use';
-
 import IdeaVoteControls from '../IdeaVoteControls';
-
 import { getPropLot_propLot_ideas as Idea } from '../../graphql/__generated__/getPropLot';
 
 const useBreakpoint = createBreakpoint({ XL: 1440, L: 940, M: 650, S: 540 });
+
+const VirtualTagColorMap = {
+  NEW: 'bg-[#FCA33A] text-white',
+};
 
 const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => {
   const breakpoint = useBreakpoint();
@@ -56,11 +57,15 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
       <div className="flex flex-row flex-1 justify-content-start align-items-center">
         <span className="text-[#212529] font-normal text-2xl flex flex-1 lodrina">{title}</span>
       </div>
-      {tags.length > 0 && (
+      {tags && tags.length > 0 && (
         <div className="flex flex-row space-x-2 mt-4">
           {tags.map(tag => {
             return (
-              <span className="text-blue-500 bg-blue-200 text-xs font-bold rounded-full px-2 py-0.5 inline">
+              <span
+                className={`${
+                  VirtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
+                } text-xs font-bold rounded-full px-2 py-0.5 inline`}
+              >
                 {tag.label}
               </span>
             );
@@ -82,11 +87,15 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
             {title}
           </span>
         </div>
-        {tags.length > 0 && (
+        {tags && tags.length > 0 && (
           <div className="flex flex-row space-x-2 mt-2">
             {tags.map(tag => {
               return (
-                <span className="text-blue-500 bg-blue-200 text-xs font-bold rounded-full px-2 py-0.5 inline">
+                <span
+                  className={`${
+                    VirtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
+                  } text-xs font-bold rounded-full px-2 py-0.5 inline`}
+                >
                   {tag.label}
                 </span>
               );
@@ -131,7 +140,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
                   : `${ideaStats?.comments || 0} comments`
               }`}
             </span>
-            <span className="flex justify-self-end text-[#2b83f6] text-sm font-bold flex justify-end">
+            <span className="justify-self-end text-[#2b83f6] text-sm font-bold flex justify-end">
               <span
                 onClick={() => {
                   history.push(`/ideas/${id}`);

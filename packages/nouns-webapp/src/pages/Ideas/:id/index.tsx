@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Col, FormControl, Row } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 import { useEthers } from '@usedapp/core';
@@ -13,6 +13,7 @@ import {
   Comment as CommentType,
   VoteFormData,
 } from '../../../hooks/useIdeas';
+import { useAuth } from '../../../hooks/useAuth';
 import { useAccountVotes } from '../../../wrappers/nounToken';
 import IdeaVoteControls from '../../../components/IdeaVoteControls';
 import moment from 'moment';
@@ -20,6 +21,9 @@ import Davatar from '@davatar/react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { createBreakpoint } from 'react-use';
+import { useLazyQuery, useQuery, gql } from '@apollo/client';
+import propLotClient from '../../../propLot/graphql/config';
+import { GET_IDEA_QUERY } from '../../../propLot/graphql/ideaQuery';
 
 const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
@@ -191,11 +195,46 @@ const IdeaPage = () => {
   const { getIdea, getComments, commentOnIdea, voteOnIdea } = useIdeas();
   const { comments, error } = getComments(id);
   const idea = getIdea(id);
+  const { getAuthHeader } = useAuth();
 
   const [comment, setComment] = useState<string>('');
   const nounBalance = useAccountVotes(account || undefined) ?? 0;
   const ens = useReverseENSLookUp(idea?.creatorId);
   const shortAddress = useShortAddress(idea?.creatorId);
+
+  const {
+    loading,
+    error: fetchError,
+    data,
+    refetch,
+    networkStatus,
+  } = useQuery(
+    gql`
+      query getIdeas {
+        getIdeas(options: {}) {
+          id
+        }
+      }
+    `,
+    {
+      variables: { ideaId: parseInt(id) },
+    },
+  );
+
+  // const [getIdeaQuery, { data, error: fetchError }] = useLazyQuery(GET_IDEA_QUERY, {
+  //   context: {
+  //     clientName: 'PropLot',
+  //     headers: {
+  //       ...getAuthHeader(),
+  //       'proplot-tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
+  //     },
+  //   },
+  //   client: propLotClient,
+  // });
+
+  console.log('data', data);
+  console.log(loading);
+  console.log(fetchError);
 
   const castVote = async (formData: VoteFormData) => {
     await voteOnIdea(formData);
@@ -248,7 +287,7 @@ const IdeaPage = () => {
                 />
               </div>
             </div>
-            {idea.tags.length > 0 && (
+            {idea.tags && idea.tags.length > 0 && (
               <div className="flex flex-row space-x-2 mt-4">
                 {idea.tags.map(tag => {
                   return (

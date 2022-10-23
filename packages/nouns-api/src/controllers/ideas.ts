@@ -26,7 +26,7 @@ class IdeasController {
       const idea = await IdeasService.get(parseInt(req.params.id));
       res.status(200).json({
         status: true,
-        message: 'All ideas',
+        message: `Idea ${req.params.id}`,
         data: idea,
       });
     } catch (e: any) {
