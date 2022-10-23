@@ -21,9 +21,11 @@ import Davatar from '@davatar/react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { createBreakpoint } from 'react-use';
-import { useLazyQuery, useQuery, gql } from '@apollo/client';
+import { getIdea } from '../../../propLot/graphql/__generated__/getIdea';
+import { useLazyQuery } from '@apollo/client';
 import propLotClient from '../../../propLot/graphql/config';
 import { GET_IDEA_QUERY } from '../../../propLot/graphql/ideaQuery';
+import { virtualTagColorMap } from '../../../utils/virtualTagColors';
 
 const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
@@ -192,49 +194,30 @@ const IdeaPage = () => {
   const { id } = useParams() as { id: string };
   const history = useHistory();
   const { account } = useEthers();
-  const { getIdea, getComments, commentOnIdea, voteOnIdea } = useIdeas();
+  const { getComments, commentOnIdea, voteOnIdea } = useIdeas();
   const { comments, error } = getComments(id);
-  const idea = getIdea(id);
   const { getAuthHeader } = useAuth();
 
   const [comment, setComment] = useState<string>('');
   const nounBalance = useAccountVotes(account || undefined) ?? 0;
-  const ens = useReverseENSLookUp(idea?.creatorId);
-  const shortAddress = useShortAddress(idea?.creatorId);
 
-  const {
-    loading,
-    error: fetchError,
-    data,
-    refetch,
-    networkStatus,
-  } = useQuery(
-    gql`
-      query getIdeas {
-        getIdeas(options: {}) {
-          id
-        }
-      }
-    `,
-    {
-      variables: { ideaId: parseInt(id) },
+  const [getIdeaQuery, { data, error: _getIdeaError }] = useLazyQuery<getIdea>(GET_IDEA_QUERY, {
+    context: {
+      clientName: 'PropLot',
+      headers: {
+        ...getAuthHeader(),
+        'proplot-tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
     },
-  );
+    client: propLotClient,
+  });
 
-  // const [getIdeaQuery, { data, error: fetchError }] = useLazyQuery(GET_IDEA_QUERY, {
-  //   context: {
-  //     clientName: 'PropLot',
-  //     headers: {
-  //       ...getAuthHeader(),
-  //       'proplot-tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
-  //     },
-  //   },
-  //   client: propLotClient,
-  // });
+  const ens = useReverseENSLookUp(data?.getIdea?.creatorId || '');
+  const shortAddress = useShortAddress(data?.getIdea?.creatorId || '');
 
-  console.log('data', data);
-  console.log(loading);
-  console.log(fetchError);
+  useEffect(() => {
+    getIdeaQuery({ variables: { ideaId: parseInt(id) } });
+  }, []);
 
   const castVote = async (formData: VoteFormData) => {
     await voteOnIdea(formData);
@@ -249,13 +232,14 @@ const IdeaPage = () => {
     setComment('');
   };
 
-  if (!idea) {
+  if (!data?.getIdea) {
     return <div>loading</div>;
   }
 
   const hasNouns = nounBalance > 0;
-  const creatorLilNoun = idea.votes?.find(vote => vote.voterId === idea.creatorId)?.voter
-    ?.lilnounCount;
+  const creatorLilNoun = data.getIdea.votes?.find(vote =>
+    data.getIdea ? vote.voterId === data.getIdea.creatorId : false,
+  )?.voter?.lilnounCount;
 
   return (
     <Section fullWidth={false}>
@@ -275,23 +259,27 @@ const IdeaPage = () => {
           </div>
           <div className="flex flex-col mb-12">
             <div className="flex flex-row justify-between items-center">
-              <h1 className="mb-0 lodrina">{idea.title}</h1>
+              <h1 className="mb-0 lodrina">{data.getIdea.title}</h1>
               <div className="flex flex-row justify-end">
                 <IdeaVoteControls
-                  id={idea.id}
+                  id={data.getIdea.id}
                   voteOnIdea={castVote}
                   nounBalance={nounBalance}
-                  voteCount={idea.votecount}
-                  votes={idea.votes}
+                  voteCount={data.getIdea.votecount ?? 0}
+                  votes={data.getIdea.votes ?? []}
                   withAvatars
                 />
               </div>
             </div>
-            {idea.tags && idea.tags.length > 0 && (
+            {data.getIdea.tags && data.getIdea.tags.length > 0 && (
               <div className="flex flex-row space-x-2 mt-4">
-                {idea.tags.map(tag => {
+                {data.getIdea.tags.map(tag => {
                   return (
-                    <span className="text-blue-500 bg-blue-200 text-xs font-bold rounded-full px-2 py-0.5 inline">
+                    <span
+                      className={`${
+                        virtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
+                      } text-xs font-bold rounded-full px-2 py-0.5 inline`}
+                    >
                       {tag.label}
                     </span>
                   );
@@ -303,13 +291,13 @@ const IdeaPage = () => {
         <div className="space-y-8">
           <div className="flex flex-col">
             <h3 className="lodrina font-bold text-2xl mb-2">tl:dr</h3>
-            <p>{idea.tldr}</p>
+            <p>{data.getIdea.tldr}</p>
           </div>
           <div className="flex flex-col">
             <h3 className="lodrina font-bold text-2xl mb-2">Description</h3>
             <div
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(marked.parse(idea.description), {
+                __html: DOMPurify.sanitize(marked.parse(data.getIdea.description), {
                   ADD_ATTR: ['target'],
                 }),
               }}
@@ -320,7 +308,7 @@ const IdeaPage = () => {
         <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
           {`${ens || shortAddress} | ${
             creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-          } | ${moment(idea.createdAt).format('MMM Do YYYY')}`}
+          } | ${moment(parseInt(data.getIdea.createdAt)).format('MMM Do YYYY')}`}
         </div>
 
         <div className="mt-2 mb-2">

@@ -8,12 +8,9 @@ import moment from 'moment';
 import { createBreakpoint } from 'react-use';
 import IdeaVoteControls from '../IdeaVoteControls';
 import { getPropLot_propLot_ideas as Idea } from '../../graphql/__generated__/getPropLot';
+import { virtualTagColorMap } from '../../../utils/virtualTagColors';
 
 const useBreakpoint = createBreakpoint({ XL: 1440, L: 940, M: 650, S: 540 });
-
-const VirtualTagColorMap = {
-  NEW: 'bg-[#FCA33A] text-white',
-};
 
 const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => {
   const breakpoint = useBreakpoint();
@@ -63,7 +60,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
             return (
               <span
                 className={`${
-                  VirtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
+                  virtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
                 } text-xs font-bold rounded-full px-2 py-0.5 inline`}
               >
                 {tag.label}
