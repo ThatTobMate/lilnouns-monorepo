@@ -1,6 +1,7 @@
 import { prisma } from '../api';
 import { DATE_FILTERS } from '../graphql/utils/queryUtils';
 import { TagType } from '@prisma/client';
+import { VirtualTags } from '../virtual';
 
 const sortFn: { [key: string]: any } = {
   LATEST: (a: any, b: any) => {
@@ -81,16 +82,6 @@ class IdeasService {
       const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn();
       const ideas = await prisma.idea.findMany({
         where: {
-          ...(tags &&
-            tags.length > 0 && {
-              tags: {
-                some: {
-                  type: {
-                    in: tags,
-                  },
-                },
-              },
-            }),
           createdAt: {
             gte: dateRange.gte,
             lte: dateRange.lte,
@@ -113,6 +104,18 @@ class IdeasService {
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
           return { ...idea, votecount };
+        })
+        .filter((idea: any) => {
+          if (!tags || tags.length === 0) {
+            return true;
+          }
+          return tags.some(tag => {
+            const virtualTag = VirtualTags[tag];
+            if (virtualTag) {
+              return virtualTag.filterFn(idea);
+            }
+            return idea.tags.some((ideaTag: any) => ideaTag.type === tag);
+          });
         })
         .sort(sortFn[sortBy || 'LATEST']);
 
