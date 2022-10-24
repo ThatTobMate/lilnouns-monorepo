@@ -28,10 +28,14 @@ const calculateVotes = (votes: any) => {
   return count;
 };
 
-const calculateConsensus = (idea: Idea, totalSupply: number) =>{
-  const consensus = (idea.votecount / totalSupply) * 100;
-  return Math.min(Math.max(Number(consensus.toPrecision(2)), 0), 100);
-}
+const calculateConsensus = (idea: Idea) => {
+  if (!idea.tokenSupplyOnCreate) {
+    return undefined;
+  }
+
+  const consensus = (idea.votecount / idea.tokenSupplyOnCreate) * 100;
+  return Math.min(Math.max(Math.floor(consensus), 0), 100);
+};
 
 class IdeasService {
   static async all({ sortBy }: { sortBy?: string }) {
@@ -108,13 +112,10 @@ class IdeasService {
         },
       });
 
-      // Can we get the total supply at a specific date/block?
-      const totalSupply = await nounsTotalSupply();
-
       const ideaData = ideas
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
-          const consensus = calculateConsensus(idea, totalSupply);
+          const consensus = calculateConsensus(idea);
           const archived = getIsArchived(idea);
 
           return { ...idea, votecount, consensus, archived };
@@ -159,9 +160,7 @@ class IdeasService {
         throw new Error('Idea not found');
       }
 
-      const totalSupply = await nounsTotalSupply();
-
-      const consensus = calculateConsensus(idea, totalSupply);
+      const consensus = calculateConsensus(idea);
       const archived = getIsArchived(idea);
 
       const ideaData = { ...idea, archived, consensus, votecount: calculateVotes(idea.votes) };
@@ -180,6 +179,13 @@ class IdeasService {
       if (!user) {
         throw new Error('Failed to save idea: missing user details');
       }
+
+      const totalSupply = await nounsTotalSupply();
+
+      if (!totalSupply) {
+        throw new Error("Failed to save idea: couldn't fetch token supply");
+      }
+
       const idea = await prisma.idea.create({
         data: {
           title: data.title,
@@ -187,6 +193,7 @@ class IdeasService {
           description: data.description,
           creatorId: user.wallet,
           votecount: 0,
+          tokenSupplyOnCreate: totalSupply,
           votes: {
             create: {
               direction: 1,
@@ -219,6 +226,12 @@ class IdeasService {
       if (isNaN(direction) || direction === 0) {
         // votes can only be 1 or -1 right now as we only support up or down votes
         throw new Error('Failed to save vote: direction is not valid');
+      }
+
+      const isArchived = await this.isIdeaArchived(data.ideaId);
+
+      if (isArchived) {
+        throw new Error('Idea has been archived');
       }
 
       const vote = prisma.vote.upsert({
@@ -293,6 +306,12 @@ class IdeasService {
         throw new Error('Failed to save comment: missing user details');
       }
 
+      const isArchived = await this.isIdeaArchived(data.ideaId);
+
+      if (isArchived) {
+        throw new Error('Idea has been archived');
+      }
+
       const comment = prisma.comment.create({
         data: {
           body: data.body,
@@ -306,6 +325,21 @@ class IdeasService {
     } catch (e) {
       throw e;
     }
+  }
+
+  static async isIdeaArchived(id: number) {
+    // Load idea first to check if it's been archived before allowing updates.
+    const idea = await prisma.idea.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!idea) {
+      throw new Error('Idea not found for comment');
+    }
+
+    return getIsArchived(idea);
   }
 }
 
