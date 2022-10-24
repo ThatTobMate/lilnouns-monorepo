@@ -1,24 +1,21 @@
 import { useEthers } from '@usedapp/core';
-import { Vote } from '../../hooks/useIdeas';
+import { Idea, Vote } from '../../hooks/useIdeas';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import Davatar from '@davatar/react';
 
 const IdeaVoteControls = ({
-  id,
-  votes,
+  idea,
   voteOnIdea,
   nounBalance,
-  voteCount,
   withAvatars = false,
 }: {
-  id: number;
-  votes?: Vote[];
+  idea: Idea;
   voteOnIdea: (args: any) => void;
   nounBalance: number;
-  voteCount: number;
   withAvatars?: boolean;
 }) => {
+  const { id, votes, votecount: voteCount, archived } = idea;
   const { account, library: provider } = useEthers();
   const hasVotes = nounBalance > 0;
 
@@ -57,7 +54,7 @@ const IdeaVoteControls = ({
           onClick={e => {
             // this prevents the click from bubbling up and opening / closing the hidden section
             e.stopPropagation();
-            if (hasVotes && !userHasUpVote) {
+            if (hasVotes && !userHasUpVote && !archived) {
               vote(1);
             }
           }}
@@ -70,7 +67,7 @@ const IdeaVoteControls = ({
           icon={faCaretDown}
           onClick={e => {
             e.stopPropagation();
-            if (hasVotes && !userHasDownVote) {
+            if (hasVotes && !userHasDownVote && !archived) {
               vote(-1);
             }
           }}

@@ -108,10 +108,12 @@ const Comment = ({
   comment,
   hasNouns,
   level,
+  isArchived,
 }: {
   comment: CommentType;
   hasNouns: boolean;
   level: number;
+  isArchived: boolean;
 }) => {
   const { id } = useParams() as { id: string };
   const [isReply, setIsReply] = useState<boolean>(false);
@@ -170,14 +172,19 @@ const Comment = ({
           {comment.replies?.map(reply => {
             return (
               <div className="ml-8" key={`replies-${reply.id}`}>
-                <Comment comment={reply} hasNouns={hasNouns} level={level + 1} />
+                <Comment
+                  comment={reply}
+                  hasNouns={hasNouns}
+                  level={level + 1}
+                  isArchived={isArchived}
+                />
               </div>
             );
           })}
         </div>
       )}
 
-      {isReply && (
+      {isReply && !isArchived && (
         <CommentInput
           value={reply}
           setValue={setReply}
@@ -261,14 +268,12 @@ const IdeaPage = () => {
             <div className="flex flex-row justify-between items-center">
               <h1 className="mb-0 lodrina">{data.getIdea.title}</h1>
               <div className="flex flex-row justify-end">
-                <IdeaVoteControls
-                  id={data.getIdea.id}
-                  voteOnIdea={castVote}
-                  nounBalance={nounBalance}
-                  voteCount={data.getIdea.votecount ?? 0}
-                  votes={data.getIdea.votes ?? []}
-                  withAvatars
-                />
+              <IdeaVoteControls
+                idea={data.getIdea}
+                voteOnIdea={castVote}
+                nounBalance={nounBalance}
+                withAvatars
+              />
               </div>
             </div>
             {data.getIdea.tags && data.getIdea.tags.length > 0 && (
@@ -308,7 +313,7 @@ const IdeaPage = () => {
         <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
           {`${ens || shortAddress} | ${
             creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-          } | ${moment(parseInt(data.getIdea.createdAt)).format('MMM Do YYYY')}`}
+          } | ${moment(parseInt(data.getIdea.createdAt)).format('MMM Do YYYY')} ${data.getIdea.archived ? '| archived' : ''}`}
         </div>
 
         <div className="mt-2 mb-2">
@@ -323,12 +328,14 @@ const IdeaPage = () => {
           </div>
         ) : (
           <>
-            <CommentInput
-              value={comment}
-              setValue={setComment}
-              hasNouns={hasNouns}
-              onSubmit={submitComment}
-            />
+            {!idea.archived && (
+              <CommentInput
+                value={comment}
+                setValue={setComment}
+                hasNouns={hasNouns}
+                onSubmit={submitComment}
+              />
+            )}
             <div className="mt-12 space-y-8">
               {comments?.map(comment => {
                 return (
@@ -337,6 +344,7 @@ const IdeaPage = () => {
                     key={`comment-${comment.id}`}
                     hasNouns={hasNouns}
                     level={1}
+                    isArchived={idea.archived}
                   />
                 );
               })}
