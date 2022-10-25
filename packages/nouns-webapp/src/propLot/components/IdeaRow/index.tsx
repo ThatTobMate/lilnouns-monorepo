@@ -90,7 +90,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
               return (
                 <span
                   className={`${
-                    VirtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
+                    virtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
                   } text-xs font-bold rounded-full px-2 py-0.5 inline`}
                 >
                   {tag.label}
