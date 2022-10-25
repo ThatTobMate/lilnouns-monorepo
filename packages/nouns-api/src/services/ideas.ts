@@ -91,8 +91,6 @@ class IdeasService {
     date?: string;
   }) {
     try {
-      const totalSupply = await nounsTotalSupply();
-      console.log(totalSupply);
       const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn();
       const ideas = await prisma.idea.findMany({
         where: {
