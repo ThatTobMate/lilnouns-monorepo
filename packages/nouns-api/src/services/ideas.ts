@@ -28,12 +28,12 @@ const calculateVotes = (votes: any) => {
   return count;
 };
 
-const calculateConsensus = (idea: Idea) => {
+const calculateConsensus = (idea: Idea, voteCount: number) => {
   if (!idea.tokenSupplyOnCreate) {
     return undefined;
   }
 
-  const consensus = (idea.votecount / idea.tokenSupplyOnCreate) * 100;
+  const consensus = (voteCount / idea.tokenSupplyOnCreate) * 100;
   return Math.min(Math.max(Math.floor(consensus), 0), 100);
 };
 
@@ -115,7 +115,7 @@ class IdeasService {
       const ideaData = ideas
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
-          const consensus = calculateConsensus(idea);
+          const consensus = calculateConsensus(idea, votecount);
           const closed = getIsClosed(idea);
 
           return { ...idea, votecount, consensus, closed };
@@ -160,10 +160,11 @@ class IdeasService {
         throw new Error('Idea not found');
       }
 
-      const consensus = calculateConsensus(idea);
+      const votecount = calculateVotes(idea.votes);
+      const consensus = calculateConsensus(idea, votecount);
       const closed = getIsClosed(idea);
 
-      const ideaData = { ...idea, closed, consensus, votecount: calculateVotes(idea.votes) };
+      const ideaData = { ...idea, closed, consensus, votecount };
 
       return ideaData;
     } catch (e: any) {
