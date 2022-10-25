@@ -45,7 +45,7 @@ export interface getPropLot_propLot_ideas {
   votecount: number;
   createdAt: string;
   ideaStats: getPropLot_propLot_ideas_ideaStats | null;
-  archived: boolean;
+  closed: boolean;
   consensus: number | null;
   tags: getPropLot_propLot_ideas_tags[] | null;
   votes: getPropLot_propLot_ideas_votes[] | null;

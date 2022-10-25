@@ -108,12 +108,12 @@ const Comment = ({
   comment,
   hasNouns,
   level,
-  isArchived,
+  isIdeaClosed,
 }: {
   comment: CommentType;
   hasNouns: boolean;
   level: number;
-  isArchived: boolean;
+  isIdeaClosed: boolean;
 }) => {
   const { id } = useParams() as { id: string };
   const [isReply, setIsReply] = useState<boolean>(false);
@@ -176,7 +176,7 @@ const Comment = ({
                   comment={reply}
                   hasNouns={hasNouns}
                   level={level + 1}
-                  isArchived={isArchived}
+                  isIdeaClosed={isIdeaClosed}
                 />
               </div>
             );
@@ -184,7 +184,7 @@ const Comment = ({
         </div>
       )}
 
-      {isReply && !isArchived && (
+      {isReply && !isIdeaClosed && (
         <CommentInput
           value={reply}
           setValue={setReply}
@@ -268,12 +268,12 @@ const IdeaPage = () => {
             <div className="flex flex-row justify-between items-center">
               <h1 className="mb-0 lodrina">{data.getIdea.title}</h1>
               <div className="flex flex-row justify-end">
-              <IdeaVoteControls
-                idea={data.getIdea}
-                voteOnIdea={castVote}
-                nounBalance={nounBalance}
-                withAvatars
-              />
+                <IdeaVoteControls
+                  idea={data.getIdea}
+                  voteOnIdea={castVote}
+                  nounBalance={nounBalance}
+                  withAvatars
+                />
               </div>
             </div>
             {data.getIdea.tags && data.getIdea.tags.length > 0 && (
@@ -313,7 +313,9 @@ const IdeaPage = () => {
         <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
           {`${ens || shortAddress} | ${
             creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-          } | ${moment(parseInt(data.getIdea.createdAt)).format('MMM Do YYYY')} ${data.getIdea.archived ? '| archived' : ''}`}
+          } | ${moment(parseInt(data.getIdea.createdAt)).format('MMM Do YYYY')} ${
+            data.getIdea.closed ? '| closed' : ''
+          }`}
         </div>
 
         <div className="mt-2 mb-2">
@@ -328,7 +330,7 @@ const IdeaPage = () => {
           </div>
         ) : (
           <>
-            {!idea.archived && (
+            {!data.getIdea.closed && (
               <CommentInput
                 value={comment}
                 setValue={setComment}
@@ -344,7 +346,7 @@ const IdeaPage = () => {
                     key={`comment-${comment.id}`}
                     hasNouns={hasNouns}
                     level={1}
-                    isArchived={idea.archived}
+                    isIdeaClosed={!!data.getIdea?.closed}
                   />
                 );
               })}

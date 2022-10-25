@@ -113,7 +113,7 @@ type Idea {
   createdAt: String!
   ideaStats: IdeaStats
   tags: [IdeaTags!]
-  archived: Boolean!
+  closed: Boolean!
   consensus: Float
 }
 

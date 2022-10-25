@@ -1,6 +1,6 @@
 import { Idea, TagType } from '@prisma/client';
 import { prisma } from '../api';
-import { DATE_FILTERS, getIsArchived } from '../graphql/utils/queryUtils';
+import { DATE_FILTERS, getIsClosed } from '../graphql/utils/queryUtils';
 import { VirtualTags } from '../virtual';
 import { nounsTotalSupply } from '../utils/utils';
 
@@ -69,9 +69,9 @@ class IdeasService {
       const ideaData = ideas
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
-          const archived = getIsArchived(idea);
+          const closed = getIsClosed(idea);
 
-          return { ...idea, votecount, archived };
+          return { ...idea, votecount, closed };
         })
         .sort(sortFn[sortBy || 'LATEST']);
 
@@ -91,6 +91,8 @@ class IdeasService {
     date?: string;
   }) {
     try {
+      const totalSupply = await nounsTotalSupply();
+      console.log(totalSupply);
       const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn();
       const ideas = await prisma.idea.findMany({
         where: {
@@ -116,9 +118,9 @@ class IdeasService {
         .map((idea: any) => {
           const votecount = calculateVotes(idea.votes);
           const consensus = calculateConsensus(idea);
-          const archived = getIsArchived(idea);
+          const closed = getIsClosed(idea);
 
-          return { ...idea, votecount, consensus, archived };
+          return { ...idea, votecount, consensus, closed };
         })
         .filter((idea: any) => {
           if (!tags || tags.length === 0) {
@@ -161,9 +163,9 @@ class IdeasService {
       }
 
       const consensus = calculateConsensus(idea);
-      const archived = getIsArchived(idea);
+      const closed = getIsClosed(idea);
 
-      const ideaData = { ...idea, archived, consensus, votecount: calculateVotes(idea.votes) };
+      const ideaData = { ...idea, closed, consensus, votecount: calculateVotes(idea.votes) };
 
       return ideaData;
     } catch (e: any) {
@@ -210,7 +212,7 @@ class IdeasService {
         },
       });
 
-      return { ...idea, archived: false };
+      return { ...idea, closed: false };
     } catch (e) {
       throw e;
     }
@@ -228,10 +230,10 @@ class IdeasService {
         throw new Error('Failed to save vote: direction is not valid');
       }
 
-      const isArchived = await this.isIdeaArchived(data.ideaId);
+      const isClosed = await this.isIdeaClosed(data.ideaId);
 
-      if (isArchived) {
-        throw new Error('Idea has been archived');
+      if (isClosed) {
+        throw new Error('Idea has been closed');
       }
 
       const vote = prisma.vote.upsert({
@@ -306,10 +308,10 @@ class IdeasService {
         throw new Error('Failed to save comment: missing user details');
       }
 
-      const isArchived = await this.isIdeaArchived(data.ideaId);
+      const isClosed = await this.isIdeaClosed(data.ideaId);
 
-      if (isArchived) {
-        throw new Error('Idea has been archived');
+      if (isClosed) {
+        throw new Error('Idea has been closed');
       }
 
       const comment = prisma.comment.create({
@@ -327,8 +329,8 @@ class IdeasService {
     }
   }
 
-  static async isIdeaArchived(id: number) {
-    // Load idea first to check if it's been archived before allowing updates.
+  static async isIdeaClosed(id: number) {
+    // Load idea first to check if it's been closed before allowing updates.
     const idea = await prisma.idea.findUnique({
       where: {
         id,
@@ -339,7 +341,7 @@ class IdeasService {
       throw new Error('Idea not found for comment');
     }
 
-    return getIsArchived(idea);
+    return getIsClosed(idea);
   }
 }
 

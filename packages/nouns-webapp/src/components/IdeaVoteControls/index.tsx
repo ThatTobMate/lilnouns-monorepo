@@ -3,6 +3,7 @@ import { Idea, Vote } from '../../hooks/useIdeas';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import Davatar from '@davatar/react';
+import { getIdea_getIdea } from '../../propLot/graphql/__generated__/getIdea';
 
 const IdeaVoteControls = ({
   idea,
@@ -10,12 +11,12 @@ const IdeaVoteControls = ({
   nounBalance,
   withAvatars = false,
 }: {
-  idea: Idea;
+  idea: Idea | getIdea_getIdea;
   voteOnIdea: (args: any) => void;
   nounBalance: number;
   withAvatars?: boolean;
 }) => {
-  const { id, votes, votecount: voteCount, archived } = idea;
+  const { id, votes, votecount: voteCount, closed } = idea;
   const { account, library: provider } = useEthers();
   const hasVotes = nounBalance > 0;
 
@@ -54,7 +55,7 @@ const IdeaVoteControls = ({
           onClick={e => {
             // this prevents the click from bubbling up and opening / closing the hidden section
             e.stopPropagation();
-            if (hasVotes && !userHasUpVote && !archived) {
+            if (hasVotes && !userHasUpVote && !closed) {
               vote(1);
             }
           }}
@@ -67,7 +68,7 @@ const IdeaVoteControls = ({
           icon={faCaretDown}
           onClick={e => {
             e.stopPropagation();
-            if (hasVotes && !userHasDownVote && !archived) {
+            if (hasVotes && !userHasDownVote && !closed) {
               vote(-1);
             }
           }}

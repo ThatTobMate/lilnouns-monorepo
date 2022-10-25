@@ -47,7 +47,7 @@ export interface Idea {
   comments?: Comment[];
   votecount: number;
   createdAt: string;
-  archived: boolean;
+  closed: boolean;
   _count?: {
     comments: number;
   };

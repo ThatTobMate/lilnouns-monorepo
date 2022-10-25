@@ -64,6 +64,6 @@ export const DATE_FILTERS: { [key: string]: any } = {
   },
 };
 
-export const getIsArchived = (idea: any) => {
+export const getIsClosed = (idea: any) => {
   return moment(idea.createdAt).isBefore(moment().subtract(7, 'days').toISOString());
 };

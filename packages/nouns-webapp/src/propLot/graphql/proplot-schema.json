@@ -1278,7 +1278,7 @@
             "deprecationReason": null
           },
           {
-            "name": "archived",
+            "name": "closed",
             "description": null,
             "args": [],
             "type": {

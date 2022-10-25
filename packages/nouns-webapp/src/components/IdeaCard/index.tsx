@@ -24,7 +24,7 @@ const IdeaCard = ({
   const breakpoint = useBreakpoint();
   const history = useHistory();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { id, tldr, title, creatorId, votes, createdAt, _count, archived } = idea;
+  const { id, tldr, title, creatorId, votes, createdAt, _count, closed } = idea;
   const isMobile = breakpoint === 'S';
 
   const ens = useReverseENSLookUp(creatorId);
@@ -93,7 +93,7 @@ const IdeaCard = ({
                 _count?.comments === 1
                   ? `${_count?.comments} comment`
                   : `${_count?.comments || 0} comments`
-              } ${archived ? '| archived' : ''}`}
+              } ${closed ? '| closed' : ''}`}
             </span>
             <span className="flex justify-self-end text-[#2b83f6] text-sm font-bold flex justify-end">
               <span
