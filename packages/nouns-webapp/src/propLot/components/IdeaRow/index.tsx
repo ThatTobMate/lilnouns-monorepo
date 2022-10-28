@@ -44,18 +44,25 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
         </div>
       </div>
       {tags && tags.length > 0 && (
-        <div className="flex flex-row space-x-2 mt-4">
+        <div className="flex flex-row flex-wrap gap-[8px] mt-[16px]">
           {tags.map(tag => {
             return (
               <span
                 className={`${
                   virtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
-                } text-xs font-bold rounded-full px-2 py-0.5 inline`}
+                } text-xs font-bold rounded-[8px] px-[8px] py-[4px] flex`}
               >
                 {tag.label}
               </span>
             );
           })}
+          <span className="flex text-[#8c8d92] font-propLot font-semibold text-[14px]">
+            {`${
+              ideaStats?.comments === 1
+                ? `${ideaStats?.comments} comment`
+                : `${ideaStats?.comments || 0} comments`
+            }`}
+          </span>
         </div>
       )}
     </>
@@ -72,18 +79,25 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
           <span className="text-[#212529] flex flex-1 ml-6">{title}</span>
         </div>
         {tags && tags.length > 0 && (
-          <div className="flex flex-row space-x-2 mt-2">
+          <div className="flex flex-row flex-wrap gap-[8px] mt-[16px]">
             {tags.map(tag => {
               return (
                 <span
                   className={`${
                     virtualTagColorMap[tag.type] || 'text-blue-500 bg-blue-200'
-                  } text-xs font-bold rounded-full px-2 py-0.5 inline`}
+                  } text-xs font-bold rounded-[8px] px-[8px] py-[4px] flex`}
                 >
                   {tag.label}
                 </span>
               );
             })}
+            <span className="flex text-[#8c8d92] font-propLot font-semibold text-[14px]">
+              {`${
+                ideaStats?.comments === 1
+                  ? `${ideaStats?.comments} comment`
+                  : `${ideaStats?.comments || 0} comments`
+              }`}
+            </span>
           </div>
         )}
       </div>
@@ -116,11 +130,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
             <span className="flex flex-1 text-[#8c8d92]">
               {`${ens || shortAddress} | ${
                 creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-              } | ${moment(createdAt, 'x').format('MMM Do YYYY')} | ${
-                ideaStats?.comments === 1
-                  ? `${ideaStats?.comments} comment`
-                  : `${ideaStats?.comments || 0} comments`
-              }`}
+              } | ${moment(createdAt, 'x').format('MMM Do YYYY')}`}
             </span>
             <span className="flex mt-[16px] sm:mt-[0px] w-full sm:w-auto justify-self-end text-[#2b83f6] flex justify-end">
               <Button
