@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -95,6 +96,23 @@ export type PropLotInputOptions = {
   requestUUID: Scalars['String'];
 };
 
+export type PropLotListItems = Comment | Idea;
+
+export type PropLotProfileInputOptions = {
+  filters?: InputMaybe<Array<Scalars['String']>>;
+  requestUUID: Scalars['String'];
+  wallet: Scalars['String'];
+};
+
+export type PropLotProfileResponse = {
+  __typename?: 'PropLotProfileResponse';
+  list?: Maybe<Array<PropLotListItems>>;
+  metadata: PropLotResponseMetadata;
+  profile: PropLotUserProfile;
+  sortFilter?: Maybe<PropLotFilter>;
+  tabFilter?: Maybe<PropLotFilter>;
+};
+
 export type PropLotResponse = {
   __typename?: 'PropLotResponse';
   dateFilter?: Maybe<PropLotFilter>;
@@ -110,12 +128,18 @@ export type PropLotResponseMetadata = {
   requestUUID: Scalars['String'];
 };
 
+export type PropLotUserProfile = {
+  __typename?: 'PropLotUserProfile';
+  user: User;
+};
+
 export type Query = {
   __typename?: 'Query';
   getAllUsers?: Maybe<Array<User>>;
   getIdea?: Maybe<Idea>;
   getIdeas?: Maybe<Array<Idea>>;
   getPropLot: PropLotResponse;
+  getPropLotProfile: PropLotProfileResponse;
   getUser?: Maybe<User>;
 };
 
@@ -132,6 +156,11 @@ export type QueryGetIdeasArgs = {
 
 export type QueryGetPropLotArgs = {
   options: PropLotInputOptions;
+};
+
+
+export type QueryGetPropLotProfileArgs = {
+  options: PropLotProfileInputOptions;
 };
 
 
@@ -179,9 +208,14 @@ export type UserInputOptions = {
 
 export type UserStats = {
   __typename?: 'UserStats';
+  downvotesReceived?: Maybe<Scalars['Int']>;
+  netVotesReceived?: Maybe<Scalars['Int']>;
   totalComments?: Maybe<Scalars['Int']>;
+  totalDownvotes?: Maybe<Scalars['Int']>;
   totalIdeas?: Maybe<Scalars['Int']>;
+  totalUpvotes?: Maybe<Scalars['Int']>;
   totalVotes?: Maybe<Scalars['Int']>;
+  upvotesReceived?: Maybe<Scalars['Int']>;
 };
 
 export type Vote = {
@@ -275,8 +309,12 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   PropLotFilter: ResolverTypeWrapper<PropLotFilter>;
   PropLotInputOptions: PropLotInputOptions;
+  PropLotListItems: ResolversTypes['Comment'] | ResolversTypes['Idea'];
+  PropLotProfileInputOptions: PropLotProfileInputOptions;
+  PropLotProfileResponse: ResolverTypeWrapper<Omit<PropLotProfileResponse, 'list'> & { list?: Maybe<Array<ResolversTypes['PropLotListItems']>> }>;
   PropLotResponse: ResolverTypeWrapper<PropLotResponse>;
   PropLotResponseMetadata: ResolverTypeWrapper<PropLotResponseMetadata>;
+  PropLotUserProfile: ResolverTypeWrapper<PropLotUserProfile>;
   Query: ResolverTypeWrapper<{}>;
   SORT_TYPE: Sort_Type;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -302,8 +340,12 @@ export type ResolversParentTypes = {
   Mutation: {};
   PropLotFilter: PropLotFilter;
   PropLotInputOptions: PropLotInputOptions;
+  PropLotListItems: ResolversParentTypes['Comment'] | ResolversParentTypes['Idea'];
+  PropLotProfileInputOptions: PropLotProfileInputOptions;
+  PropLotProfileResponse: Omit<PropLotProfileResponse, 'list'> & { list?: Maybe<Array<ResolversParentTypes['PropLotListItems']>> };
   PropLotResponse: PropLotResponse;
   PropLotResponseMetadata: PropLotResponseMetadata;
+  PropLotUserProfile: PropLotUserProfile;
   Query: {};
   String: Scalars['String'];
   SubmitVoteInputOptions: SubmitVoteInputOptions;
@@ -373,6 +415,19 @@ export type PropLotFilterResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PropLotListItemsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PropLotListItems'] = ResolversParentTypes['PropLotListItems']> = {
+  __resolveType: TypeResolveFn<'Comment' | 'Idea', ParentType, ContextType>;
+};
+
+export type PropLotProfileResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['PropLotProfileResponse'] = ResolversParentTypes['PropLotProfileResponse']> = {
+  list?: Resolver<Maybe<Array<ResolversTypes['PropLotListItems']>>, ParentType, ContextType>;
+  metadata?: Resolver<ResolversTypes['PropLotResponseMetadata'], ParentType, ContextType>;
+  profile?: Resolver<ResolversTypes['PropLotUserProfile'], ParentType, ContextType>;
+  sortFilter?: Resolver<Maybe<ResolversTypes['PropLotFilter']>, ParentType, ContextType>;
+  tabFilter?: Resolver<Maybe<ResolversTypes['PropLotFilter']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type PropLotResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['PropLotResponse'] = ResolversParentTypes['PropLotResponse']> = {
   dateFilter?: Resolver<Maybe<ResolversTypes['PropLotFilter']>, ParentType, ContextType>;
   ideas?: Resolver<Maybe<Array<ResolversTypes['Idea']>>, ParentType, ContextType>;
@@ -388,11 +443,17 @@ export type PropLotResponseMetadataResolvers<ContextType = any, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PropLotUserProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['PropLotUserProfile'] = ResolversParentTypes['PropLotUserProfile']> = {
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getAllUsers?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
   getIdea?: Resolver<Maybe<ResolversTypes['Idea']>, ParentType, ContextType, RequireFields<QueryGetIdeaArgs, 'options'>>;
   getIdeas?: Resolver<Maybe<Array<ResolversTypes['Idea']>>, ParentType, ContextType, RequireFields<QueryGetIdeasArgs, 'options'>>;
   getPropLot?: Resolver<ResolversTypes['PropLotResponse'], ParentType, ContextType, RequireFields<QueryGetPropLotArgs, 'options'>>;
+  getPropLotProfile?: Resolver<ResolversTypes['PropLotProfileResponse'], ParentType, ContextType, RequireFields<QueryGetPropLotProfileArgs, 'options'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'options'>>;
 };
 
@@ -404,9 +465,14 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type UserStatsResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserStats'] = ResolversParentTypes['UserStats']> = {
+  downvotesReceived?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  netVotesReceived?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   totalComments?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalDownvotes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   totalIdeas?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  totalUpvotes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   totalVotes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  upvotesReceived?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -427,8 +493,11 @@ export type Resolvers<ContextType = any> = {
   IdeaTags?: IdeaTagsResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PropLotFilter?: PropLotFilterResolvers<ContextType>;
+  PropLotListItems?: PropLotListItemsResolvers<ContextType>;
+  PropLotProfileResponse?: PropLotProfileResponseResolvers<ContextType>;
   PropLotResponse?: PropLotResponseResolvers<ContextType>;
   PropLotResponseMetadata?: PropLotResponseMetadataResolvers<ContextType>;
+  PropLotUserProfile?: PropLotUserProfileResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserStats?: UserStatsResolvers<ContextType>;
