@@ -88,7 +88,6 @@ const PropLotHome = () => {
   };
 
   const handleRefresh = () => {
-    console.log('refetching');
     refetch({ options: { requestUUID: v4(), filters: appliedFilters } });
   };
 
