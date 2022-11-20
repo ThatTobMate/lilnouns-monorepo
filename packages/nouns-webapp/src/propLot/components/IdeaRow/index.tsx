@@ -11,7 +11,15 @@ import { Button } from 'react-bootstrap';
 
 const useBreakpoint = createBreakpoint({ XL: 1440, L: 940, M: 650, S: 540 });
 
-const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => {
+const IdeaRow = ({
+  idea,
+  nounBalance,
+  disableControls,
+}: {
+  idea: Idea;
+  nounBalance: number;
+  disableControls?: boolean;
+}) => {
   const breakpoint = useBreakpoint();
   const history = useHistory();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -40,6 +48,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
             nounBalance={nounBalance}
             withAvatars={!isMobile}
             refetchPropLotOnVote
+            disableControls={disableControls}
           />
         </div>
       </div>
@@ -107,6 +116,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
           nounBalance={nounBalance}
           withAvatars={!isMobile}
           refetchPropLotOnVote
+          disableControls={disableControls}
         />
       </div>
     </div>
