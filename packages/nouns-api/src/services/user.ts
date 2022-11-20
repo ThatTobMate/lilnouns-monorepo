@@ -1,9 +1,42 @@
 import { prisma } from '../api';
 
+const calculateAllVotes = (votes: any) => {
+  let count = 0;
+  let upvotes = 0;
+  let downvotes = 0;
+  const calc = (acc: number, vote: any) => acc + vote.direction * vote.voter.lilnounCount;
+  votes.forEach((vote: any) => {
+    if (vote.direction === 1) {
+      upvotes = calc(upvotes, vote);
+    }
+    if (vote.direction === -1) {
+      downvotes = calc(downvotes, vote);
+    }
+    count = calc(count, vote);
+  });
+
+  return { count, upvotes, downvotes };
+};
+
+const calculateNetVotes = (ideas: any) => {
+  let netVotes = 0;
+  let netUpvotes = 0;
+  let netDownvotes = 0;
+
+  ideas.forEach((idea: any) => {
+    const { count, upvotes, downvotes } = calculateAllVotes(idea.votes);
+
+    netVotes += count;
+    netUpvotes += upvotes;
+    netDownvotes += downvotes;
+  });
+
+  return { netVotes, netUpvotes, netDownvotes };
+};
+
 class UserService {
   static async allUsers() {
     try {
-
       const users = await prisma.user.findMany({
         include: {
           _count: {
@@ -18,6 +51,32 @@ class UserService {
     }
   }
 
+  static async getUserAggregations({ wallet }: { wallet: string }) {
+    try {
+      const userIdeas = await prisma.idea.findMany({
+        where: {
+          creatorId: wallet,
+        },
+        include: {
+          votes: {
+            include: {
+              voter: true,
+            },
+          },
+          _count: {
+            select: { comments: true },
+          },
+        },
+      });
+
+      const userAggregations = calculateNetVotes(userIdeas);
+
+      return userAggregations;
+    } catch (e: any) {
+      throw e;
+    }
+  }
+
   static async getUser(wallet: string) {
     try {
       const user = await prisma.user.findUnique({
@@ -25,8 +84,9 @@ class UserService {
           wallet,
         },
         include: {
+          votes: true,
           _count: {
-            select: { comments: true, votes: true, ideas: true },
+            select: { comments: true, ideas: true },
           },
         },
       });

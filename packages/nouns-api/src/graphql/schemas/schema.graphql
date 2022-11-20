@@ -4,6 +4,7 @@ type Query {
   getAllUsers: [User!]
   getUser(options: UserInputOptions!): User
   getPropLot(options: PropLotInputOptions!): PropLotResponse!
+  getPropLotProfile(options: PropLotProfileInputOptions!): PropLotProfileResponse!
 }
 
 type Mutation {
@@ -30,6 +31,12 @@ input PropLotInputOptions {
   requestUUID: String!
 }
 
+input PropLotProfileInputOptions {
+  filters: [String!]
+  wallet: String!
+  requestUUID: String!
+}
+
 # Query response types
 
 type PropLotResponse {
@@ -39,6 +46,20 @@ type PropLotResponse {
   dateFilter: PropLotFilter
   metadata: PropLotResponseMetadata!
 }
+
+type PropLotProfileResponse {
+  profile: PropLotUserProfile!
+  list: [PropLotListItems!]
+  sortFilter: PropLotFilter
+  tabFilter: PropLotFilter
+  metadata: PropLotResponseMetadata!
+}
+
+type PropLotUserProfile {
+  user: User!
+}
+
+union PropLotListItems = Idea | Comment
 
 type PropLotFilter {
   id: String!
@@ -64,8 +85,13 @@ type PropLotResponseMetadata {
 
 type UserStats {
   totalVotes: Int
+  totalUpvotes: Int
+  totalDownvotes: Int
   totalComments: Int
   totalIdeas: Int
+  netVotesReceived: Int
+  downvotesReceived: Int
+  upvotesReceived: Int
 }
 
 type User {
