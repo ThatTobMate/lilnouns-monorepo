@@ -175,6 +175,20 @@ class IdeasService {
     }
   }
 
+  static async deleteIdea(id: number) {
+    try {
+      const idea = await prisma.idea.delete({
+        where: {
+          id,
+        },
+      });
+
+      return idea;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   static async createIdea(
     data: { title: string; tldr: string; description: string; tags: TagType[] },
     user?: { wallet: string },

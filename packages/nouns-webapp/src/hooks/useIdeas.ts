@@ -323,6 +323,29 @@ export const useIdeas = () => {
     }
   };
 
+  const deleteIdea = async (id: number) => {
+    try {
+      const res = await fetch(`${HOST}/idea/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete Idea');
+      }
+
+      history.push(`/ideas`);
+    } catch (e: any) {
+      const error = {
+        message: e.message || 'Failed to delete your idea!',
+        status: e.status || 500,
+      };
+      setError(error);
+    }
+  };
+
   return {
     voteOnIdeaList: async (formData: VoteFormData) => {
       if (!isLoggedIn()) {
@@ -357,6 +380,16 @@ export const useIdeas = () => {
         } catch (e) {}
       } else {
         submitIdea(data);
+      }
+    },
+    deleteIdea: async (id: number) => {
+      if (!isLoggedIn()) {
+        try {
+          await triggerSignIn();
+          await deleteIdea(id);
+        } catch (e) {}
+      } else {
+        deleteIdea(id);
       }
     },
     commentOnIdea: async (formData: CommentFormData) => {

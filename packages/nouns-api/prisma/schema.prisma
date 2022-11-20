@@ -43,7 +43,7 @@ model User {
 model Vote {
   id        Int    @id @default(autoincrement())
   direction Int
-  idea      Idea   @relation(fields: [ideaId], references: [id])
+  idea      Idea   @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId    Int
   voter     User   @relation(fields: [voterId], references: [wallet])
   voterId   String
@@ -56,12 +56,12 @@ model Vote {
 model Comment {
   id          Int    @id @default(autoincrement())
   body        String
-  idea        Idea   @relation(fields: [ideaId], references: [id])
+  idea        Idea   @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   ideaId      Int
   author      User   @relation(fields: [authorId], references: [wallet])
   authorId    String
   replies    Comment[] @relation("Comment_Children")
-  parent      Comment?  @relation("Comment_Children", fields: [parentId], references: [id])
+  parent      Comment?  @relation("Comment_Children", fields: [parentId], references: [id], onDelete: Cascade)
   parentId    Int?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

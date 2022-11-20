@@ -213,16 +213,18 @@ const ChainSubscriber: React.FC = () => {
       processBidFilter(...(event.args as [BigNumber, string, BigNumber, boolean]), event);
     }
 
-    nounsAuctionHouseContract.on(bidFilter, (nounId, sender, value, extended, event) =>
-      processBidFilter(nounId, sender, value, extended, event),
+    nounsAuctionHouseContract.on(
+      bidFilter,
+      (nounId: any, sender: any, value: any, extended: any, event: any) =>
+        processBidFilter(nounId, sender, value, extended, event),
     );
-    nounsAuctionHouseContract.on(createdFilter, (nounId, startTime, endTime) =>
+    nounsAuctionHouseContract.on(createdFilter, (nounId: any, startTime: any, endTime: any) =>
       processAuctionCreated(nounId, startTime, endTime),
     );
-    nounsAuctionHouseContract.on(extendedFilter, (nounId, endTime) =>
+    nounsAuctionHouseContract.on(extendedFilter, (nounId: any, endTime: any) =>
       processAuctionExtended(nounId, endTime),
     );
-    nounsAuctionHouseContract.on(settledFilter, (nounId, winner, amount) =>
+    nounsAuctionHouseContract.on(settledFilter, (nounId: any, winner: any, amount: any) =>
       processAuctionSettled(nounId, winner, amount),
     );
   };
@@ -288,30 +290,30 @@ const rollbarConfig = {
 
 ReactDOM.render(
   <RollbarProvider config={rollbarConfig}>
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <ChainSubscriber />
-          <React.StrictMode>
-            <Web3ReactProvider
-              getLibrary={
-                provider => new Web3Provider(provider) // this will vary according to whether you use e.g. ethers or web3.js
-              }
-            >
-              <ApolloProvider client={client}>
-                <PastAuctions />
-                <DAppProvider config={useDappConfig}>
-                  <ErrorModalProvider>
-                    <AuthProvider>
-                      <App />
-                      <Updaters />
-                    </AuthProvider>
-                  </ErrorModalProvider>
-                </DAppProvider>
-              </ApolloProvider>
-            </Web3ReactProvider>
-          </React.StrictMode>
-        </ConnectedRouter>
-      </Provider>
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
+        <ChainSubscriber />
+        <React.StrictMode>
+          <Web3ReactProvider
+            getLibrary={
+              provider => new Web3Provider(provider) // this will vary according to whether you use e.g. ethers or web3.js
+            }
+          >
+            <ApolloProvider client={client}>
+              <PastAuctions />
+              <DAppProvider config={useDappConfig}>
+                <ErrorModalProvider>
+                  <AuthProvider>
+                    <App />
+                    <Updaters />
+                  </AuthProvider>
+                </ErrorModalProvider>
+              </DAppProvider>
+            </ApolloProvider>
+          </Web3ReactProvider>
+        </React.StrictMode>
+      </ConnectedRouter>
+    </Provider>
     ,
   </RollbarProvider>,
   document.getElementById('root'),

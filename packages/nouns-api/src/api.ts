@@ -82,6 +82,7 @@ export const createAPI = (): Express => {
         'https://staging--frosty-hugle-07297b.netlify.app',
         'https://production--frosty-hugle-07297b.netlify.app',
         'https://lilnouns.wtf',
+        'http://localhost:3000',
         ...(config.environment === 'development' ? ['http://localhost:3000'] : []),
       ],
       methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
@@ -128,6 +129,7 @@ export const createAPI = (): Express => {
   app.post('/idea/vote', authMiddleware, IdeasController.voteOnIdea);
   app.get('/ideas', IdeasController.getAllIdeas);
   app.post('/ideas', authMiddleware, IdeasController.createIdea);
+  app.delete('/idea/:id', authMiddleware, IdeasController.deleteIdea);
   app.post('/token-transfer', authMiddleware, AuthController.syncUserTokenCounts);
 
   app.use(rollbar.errorHandler());

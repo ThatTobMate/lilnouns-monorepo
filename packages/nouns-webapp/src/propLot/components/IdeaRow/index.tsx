@@ -3,15 +3,26 @@ import { useHistory } from 'react-router-dom';
 import { useReverseENSLookUp } from '../../../utils/ensLookup';
 import { useShortAddress } from '../../../utils/addressAndENSDisplayUtils';
 import moment from 'moment';
+import { useEthers } from '@usedapp/core';
 import { createBreakpoint } from 'react-use';
 import IdeaVoteControls from '../IdeaVoteControls';
 import { getPropLot_propLot_ideas as Idea } from '../../graphql/__generated__/getPropLot';
 import { virtualTagColorMap } from '../../../utils/virtualTagColors';
 import { Button } from 'react-bootstrap';
+import { useIdeas } from '../../../hooks/useIdeas';
 
 const useBreakpoint = createBreakpoint({ XL: 1440, L: 940, M: 650, S: 540 });
 
-const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => {
+const IdeaRow = ({
+  idea,
+  nounBalance,
+  refetch,
+}: {
+  idea: Idea;
+  nounBalance: number;
+  refetch: () => void;
+}) => {
+  const { account } = useEthers();
   const breakpoint = useBreakpoint();
   const history = useHistory();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -21,6 +32,8 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
   const ens = useReverseENSLookUp(creatorId);
   const shortAddress = useShortAddress(creatorId);
   const creatorLilNoun = votes?.find(vote => vote.voterId === creatorId)?.voter?.lilnounCount;
+
+  const { deleteIdea } = useIdeas();
 
   const mobileHeading = (
     <>
@@ -120,19 +133,38 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
       {isMobile ? mobileHeading : desktopHeading}
       {isOpen && (
         <>
-          <div className="flex flex-row flex-1 justify-content-start align-items-center pt-[12px] pt-[12px]">
+          <div className="flex flex-row flex-1 justify-content-start align-items-center pt-[12px]">
             <span
               className="font-propLot text-[16px] text-[#212529] border border-[#e2e3e8] bg-[#F4F4F8] p-4 rounded-lg flex-1"
               dangerouslySetInnerHTML={{ __html: tldr }}
             />
           </div>
-          <div className="font-propLot font-semibold text-[14px] flex-col sm:flex-row flex flex-1 justify-content-start align-items-start pt-[12px] pt-[12px]">
-            <span className="flex flex-1 text-[#8c8d92]">
+          <div className="font-propLot font-semibold text-[14px] flex-col sm:flex-row flex flex-1 justify-content-start align-items-start pt-[12px]">
+            <span className="flex flex-1 text-[#8c8d92] self-end">
               {`${ens || shortAddress} | ${
                 creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
               } | ${moment(createdAt, 'x').format('MMM Do YYYY')}`}
             </span>
-            <span className="flex mt-[16px] sm:mt-[0px] w-full sm:w-auto justify-self-end text-[#2b83f6] flex justify-end">
+            {account && account.toLowerCase() === idea.creatorId.toLowerCase() && (
+              <span
+                onClick={async event => {
+                  // stop propagation to prevent the card from closing
+                  event.stopPropagation();
+                  await deleteIdea(idea.id);
+                  // TODO: debug this a bit better
+                  // there is a race condition where the refetch is triggering before the idea is actually deleted
+                  // so the UI looks like it does nothing. I added a setTimeout so we can wait for the idea to clear
+                  // ideally, the awaits would work so it wouldn't refetch until it was actually deleted
+                  setTimeout(() => {
+                    refetch();
+                  }, 500);
+                }}
+                className="text-red-500 self-end"
+              >
+                Delete
+              </span>
+            )}
+            <span className="flex mt-[16px] sm:mt-[0px] w-full sm:w-auto justify-self-end text-[#2b83f6] justify-end">
               <Button
                 className="font-propLot font-semibold text-[16px] flex flex-1 btn !rounded-[10px] bg-white border border-[#E2E3E8] p-0 hover:!bg-[#F4F4F8] focus:!bg-[#E2E3E8] !text-[#2B83F6]"
                 onClick={() => {

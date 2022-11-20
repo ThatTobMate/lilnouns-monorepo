@@ -158,30 +158,30 @@ const equalTitleRegex = /^\s*([^\n]+)\n(={3,25}|-{3,25})/;
  * Extract a markdown title from a proposal body that uses the `# Title` format
  * Returns null if no title found.
  */
- const extractHashTitle = (body: string) => body.match(hashRegex);
- /**
-  * Extract a markdown title from a proposal body that uses the `Title\n===` format.
-  * Returns null if no title found.
-  */
- const extractEqualTitle = (body: string) => body.match(equalTitleRegex);
- 
- /**
-  * Extract title from a proposal's body/description. Returns null if no title found in the first line.
-  * @param body proposal body
-  */
- const extractTitle = (body: string | undefined): string | null => {
-   if (!body) return null;
-   const hashResult = extractHashTitle(body);
-   const equalResult = extractEqualTitle(body);
-   return hashResult ? hashResult[1] : equalResult ? equalResult[1] : null;
- };
- 
- const removeBold = (text: string | null): string | null =>
-   text ? text.replace(/\*\*/g, '') : text;
- const removeItalics = (text: string | null): string | null =>
-   text ? text.replace(/__/g, '') : text;
- 
- const removeMarkdownStyle = R.compose(removeBold, removeItalics);
+const extractHashTitle = (body: string) => body.match(hashRegex);
+/**
+ * Extract a markdown title from a proposal body that uses the `Title\n===` format.
+ * Returns null if no title found.
+ */
+const extractEqualTitle = (body: string) => body.match(equalTitleRegex);
+
+/**
+ * Extract title from a proposal's body/description. Returns null if no title found in the first line.
+ * @param body proposal body
+ */
+const extractTitle = (body: string | undefined): string | null => {
+  if (!body) return null;
+  const hashResult = extractHashTitle(body);
+  const equalResult = extractEqualTitle(body);
+  return hashResult ? hashResult[1] : equalResult ? equalResult[1] : null;
+};
+
+const removeBold = (text: string | null): string | null =>
+  text ? text.replace(/\*\*/g, '') : text;
+const removeItalics = (text: string | null): string | null =>
+  text ? text.replace(/__/g, '') : text;
+
+const removeMarkdownStyle = R.compose(removeBold, removeItalics);
 
 export const useHasVotedOnProposal = (proposalId: string | undefined): boolean => {
   const { account } = useEthers();
@@ -416,7 +416,9 @@ export const useAllProposalsViaChain = (skip = false): ProposalData => {
 
     return {
       data: proposals.map((proposal, i) => {
-        const description = logs[i]?.description?.replace(/\\n/g, '\n').replace(/(^['"]|['"]$)/g, '');
+        const description = logs[i]?.description
+          ?.replace(/\\n/g, '\n')
+          .replace(/(^['"]|['"]$)/g, '');
         return {
           id: proposal?.id.toString(),
           title: R.pipe(extractTitle, removeMarkdownStyle)(description) ?? 'Untitled',
