@@ -33,6 +33,7 @@ import dayjs from 'dayjs';
 import { AvatarProvider } from '@davatar/react';
 import IdeasPage from './pages/Ideas';
 import IdeaPage from './pages/Ideas/:id';
+import PropLotUserProfilePage from './propLot/pages/PropLotUserProfile';
 import CreateIdeaPage from './pages/Ideas/Create';
 import DelegatePage from './pages/DelegatePage';
 
@@ -131,6 +132,7 @@ function App() {
               <Route exact path="/ideas" component={IdeasPage} />
               <Route exact path="/ideas/create" component={CreateIdeaPage} />
               <Route exact path="/ideas/:id" component={IdeaPage} />
+              <Route exact path="/proplot/profile/:id" component={PropLotUserProfilePage} />
               <Route exact path="/vote/:id" component={VotePage} />
               <Route exact path="/vote/nounsdao/:id" component={NounsVotePage} />
               <Route exact path="/playground" component={Playground} />
