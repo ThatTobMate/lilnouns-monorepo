@@ -24,7 +24,44 @@ import DropdownFilter from '../components/DropdownFilter';
 import { useReverseENSLookUp } from '../../utils/ensLookup';
 import { useShortAddress } from '../../utils/addressAndENSDisplayUtils';
 import useSyncURLParams from '../utils/useSyncUrlParams';
-// import { NOUNS_BY_OWNER, NOUNS_BY_OWNER_SUB } from '../../wrappers/subgraph';
+
+// Subgraph query to fetch lil nouns by owner, not working locally?
+// export const NOUNS_BY_OWNER_SUB = gql`
+//   query nouns($id: String!) {
+//     nouns(where: { owner: $id }) {
+//       id
+//       seed {
+//         background
+//         body
+//         accessory
+//         head
+//         glasses
+//       }
+//       owner {
+//         id
+//       }
+//     }
+//   }
+// `;
+
+// Zora API query to fetch lil nouns by owner. Works locally but can/do we use Zora? Also no delegation data.
+// export const NOUNS_BY_OWNER_ZORA = gql`
+//   query tokens($id: String!) {
+//     tokens(
+//       where: {
+//         ownerAddresses: [$id]
+//         collectionAddresses: ["0x4b10701bfd7bfedc47d50562b76b436fbb5bdb3b"]
+//       }
+//     ) {
+//       nodes {
+//         token {
+//           owner
+//           tokenId
+//         }
+//       }
+//     }
+//   }
+// `;
 
 const ProfileCard = (props: { title: string; count: number }) => {
   return (
@@ -55,7 +92,7 @@ const PropLotUserProfile = () => {
   );
 
   // REVIST LATER WHEN ADDING ONCHAIN DATA AND PROFILE IMAGES
-  // const [getNounsByOwnerQuery, { data: getNounsByOwnerData }] = useLazyQuery(NOUNS_BY_OWNER, {
+  // const [getNounsByOwnerQuery, { data: getNounsByOwnerData }] = useLazyQuery(NOUNS_BY_OWNER_ZORA, {
   //   context: {
   //     clientName: 'ZoraAPI',
   //   },
