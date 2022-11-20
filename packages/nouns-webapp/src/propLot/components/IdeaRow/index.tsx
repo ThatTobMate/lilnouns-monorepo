@@ -138,7 +138,15 @@ const IdeaRow = ({
           </div>
           <div className="font-propLot font-semibold text-[14px] flex-col sm:flex-row flex flex-1 justify-content-start align-items-start pt-[12px] pt-[12px]">
             <span className="flex flex-1 text-[#8c8d92]">
-              {`${ens || shortAddress} | ${
+              <span
+                className="text-[#2B83F6] underline cursor-pointer"
+                onClick={() => {
+                  history.push(`/proplot/profile/${idea.creatorId}`);
+                }}
+              >
+                {ens || shortAddress}
+              </span>{' '}
+              {` | ${
                 creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
               } | ${moment(createdAt, 'x').format('MMM Do YYYY')}`}
             </span>
