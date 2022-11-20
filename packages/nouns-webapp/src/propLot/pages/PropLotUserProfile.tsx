@@ -9,7 +9,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import Davatar from '@davatar/react';
 
 import { useEffect } from 'react';
-import { useAccountVotes } from '../../wrappers/nounToken';
+import { useAccountVotes, useNounTokenBalance } from '../../wrappers/nounToken';
 import { useAuth } from '../../hooks/useAuth';
 import { useLazyQuery } from '@apollo/client';
 import propLotClient from '../graphql/config';
@@ -128,7 +128,8 @@ const PropLotUserProfile = () => {
     refetch({ options: { wallet: id, requestUUID: v4(), filters: selectedfilters } });
   };
 
-  const nounBalance = useAccountVotes(account || undefined) ?? 0;
+  const nounBalanceWithDelegates = useAccountVotes(account || undefined) ?? 0;
+  const nounWalletBalance = useNounTokenBalance(account ?? '') ?? 0;
 
   const isAccountOwner = account !== undefined && account === id;
 
@@ -181,8 +182,11 @@ const PropLotUserProfile = () => {
               <div className="flex flex-col justify-end gap-[16px]">
                 <Davatar size={32} address={id} provider={provider} />
                 <div className="flex flex-1 text-[12px] text-[#8C8D92] font-semibold whitespace-pre">
-                  Lil nouns owned:<span className="text-[#212529]"> 1</span> delegated:
-                  <span className="text-[#212529]"> 10</span>
+                  Lil nouns owned:<span className="text-[#212529]"> {nounWalletBalance}</span>
+                  {` delegated:`}
+                  <span className="text-[#212529]">
+                    {` ${nounBalanceWithDelegates - nounWalletBalance}`}
+                  </span>
                 </div>
               </div>
             </div>
@@ -224,7 +228,7 @@ const PropLotUserProfile = () => {
                   <IdeaRow
                     idea={listItem}
                     key={`idea-${listItem.id}`}
-                    nounBalance={nounBalance}
+                    nounBalance={nounBalanceWithDelegates}
                     disableControls={isAccountOwner}
                   />
                 </div>
