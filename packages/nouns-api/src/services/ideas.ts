@@ -35,6 +35,7 @@ const PROFILE_TAB_FILTERS: { [key: string]: any } = {
         direction: -1,
       },
     },
+    creatorId: { not: wallet },
   }),
   UP_VOTES: (wallet: string) => ({
     votes: {
@@ -43,6 +44,7 @@ const PROFILE_TAB_FILTERS: { [key: string]: any } = {
         direction: 1,
       },
     },
+    creatorId: { not: wallet },
   }),
   DEFAULT: (_: string) => ({}),
 };

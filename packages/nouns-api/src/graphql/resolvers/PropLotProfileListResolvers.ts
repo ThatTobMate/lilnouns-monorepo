@@ -1,5 +1,5 @@
 import { IResolvers } from '@graphql-tools/utils';
-import { User, Vote } from '@prisma/client';
+import { User, Vote, Idea as PrismaIdea } from '@prisma/client';
 import IdeasService from '../../services/ideas';
 import UserService from '../../services/user';
 import {
@@ -24,33 +24,39 @@ type UserCounts = {
   votes: number;
 };
 
-type PrismaUser = User & { _count: UserCounts; votes: Vote[] };
+type VoteWithIdea = Vote & { idea: PrismaIdea };
 
-const totalUpvotes = (user: PrismaUser) =>
-  user?.votes?.filter((vote: Vote) => vote.direction === 1).length;
-const totalDownvotes = (user: PrismaUser) =>
-  user?.votes?.filter((vote: Vote) => vote.direction === -1).length;
+type PrismaUser = User & { _count: UserCounts; votes: VoteWithIdea[] };
+
+const totalUpvotes = (user: PrismaUser, wallet: string) =>
+  user?.votes?.filter(
+    (vote: VoteWithIdea) => vote.direction === 1 && vote?.idea?.creatorId !== wallet,
+  ).length;
+const totalDownvotes = (user: PrismaUser, wallet: string) =>
+  user?.votes?.filter(
+    (vote: VoteWithIdea) => vote.direction === -1 && vote?.idea?.creatorId !== wallet,
+  ).length;
 
 export const PROFILE_TAB_FILTERS: { [key: string]: any } = {
   SUBMISSIONS: {
     value: buildFilterParam(FILTER_IDS.PROFILE_TAB, 'SUBMISSIONS'),
     displayName: (user: PrismaUser) => `Submitted ${user?._count?.ideas || 0}`,
-    active: (user: PrismaUser) => user?._count?.ideas && user._count.ideas > 0,
+    active: (_: any) => true,
+  },
+  UP_VOTES: {
+    value: buildFilterParam(FILTER_IDS.PROFILE_TAB, 'UP_VOTES'),
+    displayName: (user: PrismaUser, wallet: string) => `Upvoted ${totalUpvotes(user, wallet)}`,
+    active: (_: any) => true,
+  },
+  DOWN_VOTES: {
+    value: buildFilterParam(FILTER_IDS.PROFILE_TAB, 'DOWN_VOTES'),
+    displayName: (user: PrismaUser, wallet: string) => `Downvoted ${totalDownvotes(user, wallet)}`,
+    active: (_: any) => true,
   },
   COMMENTS: {
     value: buildFilterParam(FILTER_IDS.PROFILE_TAB, 'COMMENTS'),
     displayName: (user: PrismaUser) => `Comments ${user?._count?.comments || 0}`,
-    active: (user: PrismaUser) => user?._count?.comments && user._count.comments > 0,
-  },
-  DOWN_VOTES: {
-    value: buildFilterParam(FILTER_IDS.PROFILE_TAB, 'DOWN_VOTES'),
-    displayName: (user: PrismaUser) => `Downvoted ${totalDownvotes(user)}`,
-    active: (user: PrismaUser) => totalDownvotes(user) > 0,
-  },
-  UP_VOTES: {
-    value: buildFilterParam(FILTER_IDS.PROFILE_TAB, 'UP_VOTES'),
-    displayName: (user: PrismaUser) => `Upvoted ${totalUpvotes(user)}`,
-    active: (user: PrismaUser) => totalUpvotes(user) > 0,
+    active: (_: any) => true,
   },
 };
 
@@ -121,7 +127,7 @@ const resolvers: IResolvers = {
           return {
             id: `${FILTER_IDS.PROFILE_TAB}-${key}`,
             selected: root.tabParam === PROFILE_TAB_FILTERS[key].value,
-            label: PROFILE_TAB_FILTERS[key].displayName(root.user),
+            label: PROFILE_TAB_FILTERS[key].displayName(root.user, root.wallet),
             value: PROFILE_TAB_FILTERS[key].value,
           };
         });
