@@ -336,6 +336,7 @@ class IdeasService {
         where: {
           ideaId: id,
           parentId: null,
+          deleted: false,
         },
         include: {
           replies: {
