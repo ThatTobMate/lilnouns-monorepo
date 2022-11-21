@@ -305,7 +305,7 @@ const IdeaPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12">
+        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12 whitespace-pre">
           <span
             className="text-[#2B83F6] underline cursor-pointer"
             onClick={() => {
