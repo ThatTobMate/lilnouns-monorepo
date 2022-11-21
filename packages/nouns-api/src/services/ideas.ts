@@ -54,6 +54,9 @@ class IdeasService {
       // });
 
       const ideas = await prisma.idea.findMany({
+        where: {
+          deleted: false,
+        },
         include: {
           votes: {
             include: {
@@ -98,6 +101,7 @@ class IdeasService {
             gte: dateRange.gte,
             lte: dateRange.lte,
           },
+          deleted: false,
         },
         include: {
           tags: true,
@@ -163,6 +167,10 @@ class IdeasService {
         throw new Error('Idea not found');
       }
 
+      if (idea.deleted) {
+        throw new Error('Idea has been deleted!');
+      }
+
       const votecount = calculateVotes(idea.votes);
       const consensus = calculateConsensus(idea, votecount);
       const closed = getIsClosed(idea);
@@ -177,9 +185,12 @@ class IdeasService {
 
   static async deleteIdea(id: number) {
     try {
-      const idea = await prisma.idea.delete({
+      const idea = await prisma.idea.update({
         where: {
           id,
+        },
+        data: {
+          deleted: true,
         },
       });
 
@@ -250,6 +261,16 @@ class IdeasService {
 
       if (isClosed) {
         throw new Error('Idea has been closed');
+      }
+
+      const idea = await prisma.idea.findUnique({
+        where: {
+          id: data.ideaId,
+        },
+      });
+
+      if (idea?.deleted) {
+        throw new Error('Idea has been deleted');
       }
 
       const vote = prisma.vote.upsert({
@@ -330,6 +351,12 @@ class IdeasService {
         throw new Error('Idea has been closed');
       }
 
+      const isDeleted = await this.isIdeaDeleted(data.ideaId);
+
+      if (isDeleted) {
+        throw new Error('Idea has been deleted');
+      }
+
       const comment = prisma.comment.create({
         data: {
           body: data.body,
@@ -343,6 +370,16 @@ class IdeasService {
     } catch (e) {
       throw e;
     }
+  }
+
+  static async isIdeaDeleted(id: number) {
+    const idea = await prisma.idea.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return idea?.deleted;
   }
 
   static async isIdeaClosed(id: number) {

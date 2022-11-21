@@ -24,6 +24,7 @@ model Idea {
   votecount   Int       @default(value: 0) // Vote.direction * Vote.voter.lilnounCount
   tags        Tag[]
   tokenSupplyOnCreate Int? @default(value: 0) // token supply at time of Idea creation.
+  deleted     Boolean @default(value: false)
 }
 
 model User {
@@ -65,6 +66,7 @@ model Comment {
   parentId    Int?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  deleted     Boolean @default(value: false)
 }
 
 model Tag {
