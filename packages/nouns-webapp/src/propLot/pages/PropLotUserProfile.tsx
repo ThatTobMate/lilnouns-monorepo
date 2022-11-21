@@ -1,10 +1,11 @@
-import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Section from '../../layout/Section';
 import { v4 } from 'uuid';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { useEthers } from '@usedapp/core';
+import { BigNumber as EthersBN } from 'ethers';
 import { useHistory, useParams } from 'react-router-dom';
+import { gql } from '@apollo/client';
 
 import Davatar from '@davatar/react';
 
@@ -24,25 +25,30 @@ import DropdownFilter from '../components/DropdownFilter';
 import { useReverseENSLookUp } from '../../utils/ensLookup';
 import { useShortAddress } from '../../utils/addressAndENSDisplayUtils';
 import useSyncURLParams from '../utils/useSyncUrlParams';
+import { StandaloneNounCircular } from '../../components/StandaloneNoun';
+import { pseudoRandomPredictableShuffle } from '../../utils/pseudoRandomPredictableShuffle';
 
 // Subgraph query to fetch lil nouns by owner, not working locally?
-// export const NOUNS_BY_OWNER_SUB = gql`
-//   query nouns($id: String!) {
-//     nouns(where: { owner: $id }) {
-//       id
-//       seed {
-//         background
-//         body
-//         accessory
-//         head
-//         glasses
-//       }
-//       owner {
-//         id
-//       }
-//     }
-//   }
-// `;
+export const NOUNS_BY_OWNER_SUB = gql`
+  query nouns($id: String!) {
+    nouns(where: { owner: $id }) {
+      id
+      seed {
+        background
+        body
+        accessory
+        head
+        glasses
+      }
+      owner {
+        id
+        delegate {
+          id
+        }
+      }
+    }
+  }
+`;
 
 // Zora API query to fetch lil nouns by owner. Works locally but can/do we use Zora? Also no delegation data.
 // export const NOUNS_BY_OWNER_ZORA = gql`
@@ -72,9 +78,62 @@ const ProfileCard = (props: { title: string; count: number }) => {
   );
 };
 
+const ProfileLilNounDisplay = ({
+  nounBalanceWithDelegates,
+  nounWalletBalance,
+}: {
+  nounBalanceWithDelegates: number;
+  nounWalletBalance: number;
+}) => {
+  const { id } = useParams() as { id: string };
+  const { library: provider } = useEthers();
+
+  const [getNounsByOwnerQuerySub, { data: getNounsByOwnerDataSub }] = useLazyQuery(
+    NOUNS_BY_OWNER_SUB,
+    {
+      context: {
+        clientName: 'LilNouns',
+      },
+    },
+  );
+
+  useEffect(() => {
+    getNounsByOwnerQuerySub({
+      variables: {
+        id,
+      },
+    });
+  }, [id]);
+
+  console.log(getNounsByOwnerDataSub);
+
+  const lilNounData = getNounsByOwnerDataSub?.nouns || [];
+
+  const shuffledLilNouns = pseudoRandomPredictableShuffle(lilNounData, +new Date());
+
+  console.log(shuffledLilNouns);
+
+  return (
+    <div className="flex flex-col justify-end gap-[16px]">
+      {Boolean(shuffledLilNouns?.length) ? (
+        shuffledLilNouns.map(lilNoun => {
+          return <StandaloneNounCircular nounId={EthersBN.from(lilNoun.id)} />;
+        })
+      ) : (
+        <Davatar size={32} address={id} provider={provider} />
+      )}
+      <div className="flex flex-1 text-[12px] text-[#8C8D92] font-semibold whitespace-pre">
+        Lil nouns owned:<span className="text-[#212529]"> {nounWalletBalance}</span>
+        {` delegated:`}
+        <span className="text-[#212529]">{` ${nounBalanceWithDelegates - nounWalletBalance}`}</span>
+      </div>
+    </div>
+  );
+};
+
 const PropLotUserProfile = () => {
   const { id } = useParams() as { id: string };
-  const { account, library: provider } = useEthers();
+  const { account } = useEthers();
   const { getAuthHeader } = useAuth();
 
   const [getPropLotProfileQuery, { data, refetch }] = useLazyQuery<getPropLotProfile>(
@@ -99,16 +158,6 @@ const PropLotUserProfile = () => {
   //   client: zoraClient,
   // });
 
-  // const [getNounsByOwnerQuerySub, { data: getNounsByOwnerDataSub }] = useLazyQuery(
-  //   NOUNS_BY_OWNER_SUB,
-  //   {
-  //     context: {
-  //       clientName: 'LilNouns',
-  //     },
-  //     client: defaultClient,
-  //   },
-  // );
-
   /*
     Parse the query params from the url on page load and send them as filters in the initial
     PropLot query.
@@ -129,18 +178,6 @@ const PropLotUserProfile = () => {
         },
       },
     });
-
-    // getNounsByOwnerQuery({
-    //   variables: {
-    //     id: '0x8B488CC76a38777c2f7B76eB6D49bDF430132Ac9',
-    //   },
-    // });
-
-    // getNounsByOwnerQuerySub({
-    //   variables: {
-    //     id: '0x8B488CC76a38777c2f7B76eB6D49bDF430132Ac9',
-    //   },
-    // });
   }, [id]);
 
   /*
@@ -169,14 +206,6 @@ const PropLotUserProfile = () => {
   const nounWalletBalance = useNounTokenBalance(id ?? '') ?? 0;
 
   const isAccountOwner = account !== undefined && account === id;
-
-  // const shuffledNounIds = pseudoRandomPredictableShuffle(nounIds, +new Date());
-  // const paddedNounIds = shuffledNounIds
-  //   .map((nounId: string) => {
-  //     return <StandaloneNounCircular nounId={EthersBN.from(nounId)} />;
-  //   })
-  //   .concat(Array(5).fill(<GrayCircle />))
-  //   .slice(0, 5);
 
   const ens = useReverseENSLookUp(id);
   const shortAddress = useShortAddress(id);
@@ -216,16 +245,10 @@ const PropLotUserProfile = () => {
                   {ens || shortAddress}
                 </h1>
               </div>
-              <div className="flex flex-col justify-end gap-[16px]">
-                <Davatar size={32} address={id} provider={provider} />
-                <div className="flex flex-1 text-[12px] text-[#8C8D92] font-semibold whitespace-pre">
-                  Lil nouns owned:<span className="text-[#212529]"> {nounWalletBalance}</span>
-                  {` delegated:`}
-                  <span className="text-[#212529]">
-                    {` ${nounBalanceWithDelegates - nounWalletBalance}`}
-                  </span>
-                </div>
-              </div>
+              <ProfileLilNounDisplay
+                nounBalanceWithDelegates={nounBalanceWithDelegates}
+                nounWalletBalance={nounWalletBalance}
+              />
             </div>
           </div>
         </Row>
