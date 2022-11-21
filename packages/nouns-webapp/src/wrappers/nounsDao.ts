@@ -456,7 +456,7 @@ export const useProposal = (id: string | number): Proposal | undefined => {
 
 export const useCastVote = () => {
   const { send: castVote, state: castVoteState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'castVote',
   );
   return { castVote, castVoteState };
@@ -464,20 +464,23 @@ export const useCastVote = () => {
 
 export const useCastVoteWithReason = () => {
   const { send: castVoteWithReason, state: castVoteWithReasonState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'castVoteWithReason',
   );
   return { castVoteWithReason, castVoteWithReasonState };
 };
 
 export const usePropose = () => {
-  const { send: propose, state: proposeState } = useContractFunction(nounsDaoContract, 'propose');
+  const { send: propose, state: proposeState } = useContractFunction(
+    nounsDaoContract as any,
+    'propose',
+  );
   return { propose, proposeState };
 };
 
 export const useQueueProposal = () => {
   const { send: queueProposal, state: queueProposalState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'queue',
   );
   return { queueProposal, queueProposalState };
@@ -485,7 +488,7 @@ export const useQueueProposal = () => {
 
 export const useCancelProposal = () => {
   const { send: cancelProposal, state: cancelProposalState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'cancel',
   );
   return { cancelProposal, cancelProposalState };
@@ -493,7 +496,7 @@ export const useCancelProposal = () => {
 
 export const useExecuteProposal = () => {
   const { send: executeProposal, state: executeProposalState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'execute',
   );
   return { executeProposal, executeProposalState };

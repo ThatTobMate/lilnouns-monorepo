@@ -96,11 +96,11 @@ const Bid: React.FC<{
   );
 
   const { send: placeBid, state: placeBidState } = useContractFunction(
-    nounsAuctionHouseContract,
+    nounsAuctionHouseContract as any,
     AuctionHouseContractFunction.createBid,
   );
   const { send: settleAuction, state: settleAuctionState } = useContractFunction(
-    nounsAuctionHouseContract,
+    nounsAuctionHouseContract as any,
     AuctionHouseContractFunction.settleCurrentAndCreateNewAuction,
   );
 
@@ -133,7 +133,7 @@ const Bid: React.FC<{
     }
 
     const value = utils.parseEther(bidInputRef.current.value.toString());
-    const contract = connectContractToSigner(nounsAuctionHouseContract, undefined, library);
+    const contract = connectContractToSigner(nounsAuctionHouseContract as any, undefined, library);
     const gasLimit = await contract.estimateGas.createBid(auction.nounId, {
       value,
     });
@@ -147,7 +147,7 @@ const Bid: React.FC<{
 
     //TODO: fat finger check here 900% increase
     //Operator '>' cannot be applied to types 'BigNumber' and 'number'.
-    
+
     //0.15 = 150000000000000000
     //1.5 = 1500000000000000000
     if (
@@ -174,7 +174,7 @@ const Bid: React.FC<{
   };
 
   const settleAuctionHandlerFunc = () => {
-    settleAuction()
+    settleAuction();
   };
 
   const settleAuctionHandler = () => {
@@ -187,7 +187,6 @@ const Bid: React.FC<{
       actionMessage: 'Settle Auction',
       action: settleAuctionHandlerFunc,
     });
-
   };
 
   const clearBidInput = () => {
@@ -357,11 +356,11 @@ const Bid: React.FC<{
             ) : (
               <>
                 <Col lg={12}>
-                <button onClick={showBidModalHandler} className={classes.infoButton}>
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  {` bidding and settling`}
-                </button>
-              </Col>
+                  <button onClick={showBidModalHandler} className={classes.infoButton}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    {` bidding and settling`}
+                  </button>
+                </Col>
               </>
             )}
           </>

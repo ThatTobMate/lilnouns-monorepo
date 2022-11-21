@@ -36,7 +36,9 @@ const abi = new utils.Interface(NounsDAOV2ABI);
 // const abi_v2 = new utils.Interface(NounsDAOV2ABI);
 // console.log(`NounsDAOV2ABI: ${JSON.stringify(NounsDAOV2ABI)}`);
 
-const nounsDaoContract = new NounsDaoLogicV1Factory().attach(config.bigNounsAddresses.nounsDAOProxy);
+const nounsDaoContract = new NounsDaoLogicV1Factory().attach(
+  config.bigNounsAddresses.nounsDAOProxy,
+);
 
 // Start the log search at the mainnet deployment block to speed up log queries
 const fromBlock = CHAIN_ID === ChainId.Mainnet ? 12985453 : 0;
@@ -330,7 +332,6 @@ export const useAllBigNounProposalsViaSubgraph = (): ProposalData => {
   });
 
   // console.log(`proposals??:  ${JSON.stringify(data.daa)}`);
-  
 
   return {
     loading,
@@ -371,7 +372,9 @@ export const useAllBigNounProposalsViaChain = (skip = false): ProposalData => {
 
     return {
       data: proposals.map((proposal, i) => {
-        const description = logs[i]?.description?.replace(/\\n/g, '\n').replace(/(^['"]|['"]$)/g, '');
+        const description = logs[i]?.description
+          ?.replace(/\\n/g, '\n')
+          .replace(/(^['"]|['"]$)/g, '');
         return {
           id: proposal?.id.toString(),
           title: R.pipe(extractTitle, removeMarkdownStyle)(description) ?? 'Untitled',
@@ -407,7 +410,7 @@ export const useAllBigNounProposals = (): ProposalData => {
 
 export const useBigNounProposal = (id: string | number): Proposal | undefined => {
   const subgraph = useAllBigNounProposalsViaSubgraph();
-  const { data } = subgraph//useAllBigNounProposals();
+  const { data } = subgraph; //useAllBigNounProposals();
 
   // console.log(`useBigNounProposal: ${id.toString()} == ${JSON.stringify(data?.find(p => p.id === "171")?.title)}`);
   return data?.find(p => p.id === id.toString());
@@ -415,7 +418,7 @@ export const useBigNounProposal = (id: string | number): Proposal | undefined =>
 
 export const useCastBigNounVote = () => {
   const { send: castVote, state: castVoteState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'castVote',
   );
   return { castVote, castVoteState };
@@ -423,20 +426,23 @@ export const useCastBigNounVote = () => {
 
 export const useCastBigNounVoteWithReason = () => {
   const { send: castVoteWithReason, state: castVoteWithReasonState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'castVoteWithReason',
   );
   return { castVoteWithReason, castVoteWithReasonState };
 };
 
 export const useBigNounPropose = () => {
-  const { send: propose, state: proposeState } = useContractFunction(nounsDaoContract, 'propose');
+  const { send: propose, state: proposeState } = useContractFunction(
+    nounsDaoContract as any,
+    'propose',
+  );
   return { propose, proposeState };
 };
 
 export const useQueueBigNounProposal = () => {
   const { send: queueProposal, state: queueProposalState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'queue',
   );
   return { queueProposal, queueProposalState };
@@ -444,7 +450,7 @@ export const useQueueBigNounProposal = () => {
 
 export const useExecuteBigNounProposal = () => {
   const { send: executeProposal, state: executeProposalState } = useContractFunction(
-    nounsDaoContract,
+    nounsDaoContract as any,
     'execute',
   );
   return { executeProposal, executeProposalState };

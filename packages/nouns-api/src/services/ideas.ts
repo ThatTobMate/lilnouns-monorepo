@@ -200,6 +200,23 @@ class IdeasService {
     }
   }
 
+  static async deleteComment(id: number) {
+    try {
+      const comment = await prisma.comment.update({
+        where: {
+          id,
+        },
+        data: {
+          deleted: true,
+        },
+      });
+
+      return comment;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   static async createIdea(
     data: { title: string; tldr: string; description: string; tags: TagType[] },
     user?: { wallet: string },

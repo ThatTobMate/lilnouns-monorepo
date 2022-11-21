@@ -130,6 +130,7 @@ export const createAPI = (): Express => {
   app.get('/ideas', IdeasController.getAllIdeas);
   app.post('/ideas', authMiddleware, IdeasController.createIdea);
   app.delete('/idea/:id', authMiddleware, IdeasController.deleteIdea);
+  app.delete('/comment/:id', authMiddleware, IdeasController.deleteComment);
   app.post('/token-transfer', authMiddleware, AuthController.syncUserTokenCounts);
 
   app.use(rollbar.errorHandler());

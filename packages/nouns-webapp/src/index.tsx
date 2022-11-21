@@ -155,7 +155,7 @@ const ChainSubscriber: React.FC = () => {
     const wsProvider = new WebSocketProvider(config.app.wsRpcUri);
     const nounsAuctionHouseContract = NounsAuctionHouseFactory.connect(
       config.addresses.nounsAuctionHouseProxy,
-      wsProvider,
+      wsProvider as any,
     );
 
     const bidFilter = nounsAuctionHouseContract.filters.AuctionBid(null, null, null, null);

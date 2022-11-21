@@ -323,6 +323,27 @@ export const useIdeas = () => {
     }
   };
 
+  const deleteComment = async (commentId: number) => {
+    try {
+      const res = await fetch(`${HOST}/comment/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete Idea');
+      }
+    } catch (e: any) {
+      const error = {
+        message: e.message || 'Failed to delete comment!',
+        status: e.status || 500,
+      };
+      setError(error);
+    }
+  };
+
   const deleteIdea = async (id: number) => {
     try {
       const res = await fetch(`${HOST}/idea/${id}`, {
@@ -337,6 +358,7 @@ export const useIdeas = () => {
       }
 
       history.push(`/ideas`);
+      return res;
     } catch (e: any) {
       const error = {
         message: e.message || 'Failed to delete your idea!',
@@ -382,14 +404,24 @@ export const useIdeas = () => {
         submitIdea(data);
       }
     },
-    deleteIdea: async (id: number) => {
+    deleteComment: async (commentId: number) => {
       if (!isLoggedIn()) {
         try {
           await triggerSignIn();
-          await deleteIdea(id);
+          await deleteComment(commentId);
         } catch (e) {}
       } else {
-        deleteIdea(id);
+        await deleteComment(commentId);
+      }
+    },
+    deleteIdea: async (ideaId: number) => {
+      if (!isLoggedIn()) {
+        try {
+          await triggerSignIn();
+          await deleteIdea(ideaId);
+        } catch (e) {}
+      } else {
+        await deleteIdea(ideaId);
       }
     },
     commentOnIdea: async (formData: CommentFormData) => {

@@ -131,6 +131,49 @@ class IdeasController {
     }
   };
 
+  static deleteComment = async (req: Request, res: Response, next: any) => {
+    try {
+      const address = req.user?.wallet;
+
+      if (!address) {
+        res
+          .status(500)
+          .json({
+            message: 'You must be logged in to delete a comment.',
+          })
+          .end();
+      }
+
+      const comment = await prisma.comment.findUnique({
+        where: {
+          id: parseInt(req.params.id),
+        },
+      });
+
+      if (comment?.authorId !== address) {
+        res
+          .status(500)
+          .json({
+            message: 'You must be the owner of the comment to delete it.',
+          })
+          .end();
+      }
+      const deletedComment = await IdeasService.deleteComment(parseInt(req.params.id));
+      res.status(200).json({
+        status: true,
+        message: 'Comment deleted',
+        data: deletedComment,
+      });
+    } catch (e: any) {
+      res
+        .status(e.statusCode || 500)
+        .json({
+          message: e.message,
+        })
+        .end();
+    }
+  };
+
   static deleteIdea = async (req: Request, res: Response, next: any) => {
     try {
       const address = req.user?.wallet;
