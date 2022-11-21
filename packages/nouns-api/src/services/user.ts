@@ -84,7 +84,11 @@ class UserService {
           wallet,
         },
         include: {
-          votes: true,
+          votes: {
+            include: {
+              idea: true,
+            },
+          },
           _count: {
             select: { comments: true, ideas: true },
           },
