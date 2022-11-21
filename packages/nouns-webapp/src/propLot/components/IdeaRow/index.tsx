@@ -137,7 +137,7 @@ const IdeaRow = ({
             />
           </div>
           <div className="font-propLot font-semibold text-[14px] flex-col sm:flex-row flex flex-1 justify-content-start align-items-start pt-[12px] pt-[12px]">
-            <span className="flex flex-1 text-[#8c8d92]">
+            <span className="flex flex-1 text-[#8c8d92] whitespace-pre">
               <span
                 className="text-[#2B83F6] underline cursor-pointer"
                 onClick={() => {
