@@ -141,7 +141,7 @@ const PropLotUserProfile = () => {
     //     id: '0x8B488CC76a38777c2f7B76eB6D49bDF430132Ac9',
     //   },
     // });
-  }, []);
+  }, [id]);
 
   /*
     Filters that are applied to the current response.
