@@ -165,8 +165,8 @@ const PropLotUserProfile = () => {
     refetch({ options: { wallet: id, requestUUID: v4(), filters: selectedfilters } });
   };
 
-  const nounBalanceWithDelegates = useAccountVotes(account || undefined) ?? 0;
-  const nounWalletBalance = useNounTokenBalance(account ?? '') ?? 0;
+  const nounBalanceWithDelegates = useAccountVotes(id || undefined) ?? 0;
+  const nounWalletBalance = useNounTokenBalance(id ?? '') ?? 0;
 
   const isAccountOwner = account !== undefined && account === id;
 
