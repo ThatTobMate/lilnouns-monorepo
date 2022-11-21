@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { Alert } from 'react-bootstrap';
 import { useEthers } from '@usedapp/core';
 import { BigNumber as EthersBN } from 'ethers';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { gql } from '@apollo/client';
 
 import Davatar from '@davatar/react';
@@ -26,48 +26,26 @@ import { useReverseENSLookUp } from '../../utils/ensLookup';
 import { useShortAddress } from '../../utils/addressAndENSDisplayUtils';
 import useSyncURLParams from '../utils/useSyncUrlParams';
 import { StandaloneNounCircular } from '../../components/StandaloneNoun';
-import { pseudoRandomPredictableShuffle } from '../../utils/pseudoRandomPredictableShuffle';
+import { GrayCircle } from '../../components/GrayCircle';
 
 // Subgraph query to fetch lil nouns by owner, not working locally?
 export const NOUNS_BY_OWNER_SUB = gql`
-  query nouns($id: String!) {
-    nouns(where: { owner: $id }) {
+  query account($id: String!) {
+    account(id: $id) {
       id
-      seed {
-        background
-        body
-        accessory
-        head
-        glasses
-      }
-      owner {
+      nouns {
         id
-        delegate {
-          id
+        seed {
+          background
+          body
+          accessory
+          head
+          glasses
         }
       }
     }
   }
 `;
-
-// Zora API query to fetch lil nouns by owner. Works locally but can/do we use Zora? Also no delegation data.
-// export const NOUNS_BY_OWNER_ZORA = gql`
-//   query tokens($id: String!) {
-//     tokens(
-//       where: {
-//         ownerAddresses: [$id]
-//         collectionAddresses: ["0x4b10701bfd7bfedc47d50562b76b436fbb5bdb3b"]
-//       }
-//     ) {
-//       nodes {
-//         token {
-//           owner
-//           tokenId
-//         }
-//       }
-//     }
-//   }
-// `;
 
 const ProfileCard = (props: { title: string; count: number }) => {
   return (
@@ -100,29 +78,46 @@ const ProfileLilNounDisplay = ({
   useEffect(() => {
     getNounsByOwnerQuerySub({
       variables: {
-        id,
+        id: id.toLowerCase(),
       },
     });
   }, [id]);
 
-  console.log(getNounsByOwnerDataSub);
-
-  const lilNounData = getNounsByOwnerDataSub?.nouns || [];
-
-  const shuffledLilNouns = pseudoRandomPredictableShuffle(lilNounData, +new Date());
-
-  console.log(shuffledLilNouns);
+  const lilNounData = getNounsByOwnerDataSub?.account?.nouns || [];
 
   return (
     <div className="flex flex-col justify-end gap-[16px]">
-      {Boolean(shuffledLilNouns?.length) ? (
-        shuffledLilNouns.map(lilNoun => {
-          return <StandaloneNounCircular nounId={EthersBN.from(lilNoun.id)} />;
-        })
+      {Boolean(lilNounData?.length) ? (
+        <div className="flex flex-1 flex-row-reverse gap-[4px] justify-center">
+          <>
+            {lilNounData
+              .map((lilNoun: any) => {
+                return (
+                  <StandaloneNounCircular
+                    nounId={EthersBN.from(lilNoun.id)}
+                    styleOverride="!w-[48px] !h-[48px]"
+                  />
+                );
+              })
+              .slice(0, 5)}
+            {lilNounData.length > 5 && (
+              <GrayCircle
+                styleOverride="!w-[48px] !h-[48px]"
+                renderOverlay={() => {
+                  return (
+                    <span className="flex flex-1 mb-[-48px] text-[12px] h-full font-propLot font-semibold z-10 !text-[#212529] items-center justify-center">{`+${
+                      lilNounData.length - 5
+                    }`}</span>
+                  );
+                }}
+              />
+            )}
+          </>
+        </div>
       ) : (
         <Davatar size={32} address={id} provider={provider} />
       )}
-      <div className="flex flex-1 text-[12px] text-[#8C8D92] font-semibold whitespace-pre">
+      <div className="flex flex-1 text-[12px] text-[#8C8D92] font-semibold whitespace-pre justify-center">
         Lil nouns owned:<span className="text-[#212529]"> {nounWalletBalance}</span>
         {` delegated:`}
         <span className="text-[#212529]">{` ${nounBalanceWithDelegates - nounWalletBalance}`}</span>
