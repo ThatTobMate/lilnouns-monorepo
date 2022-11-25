@@ -33,8 +33,34 @@ export interface getPropLotProfile_propLotProfile_profile {
   user: getPropLotProfile_propLotProfile_profile_user;
 }
 
+export interface getPropLotProfile_propLotProfile_list_Comment_parent {
+  __typename: "CommentParent";
+  id: number;
+  body: string;
+  ideaId: number;
+  authorId: string;
+  createdAt: any;
+}
+
+export interface getPropLotProfile_propLotProfile_list_Comment_idea {
+  __typename: "Idea";
+  id: number;
+  title: string;
+  creatorId: string;
+  closed: boolean;
+  consensus: number | null;
+}
+
 export interface getPropLotProfile_propLotProfile_list_Comment {
   __typename: "Comment";
+  id: number;
+  body: string;
+  ideaId: number;
+  parentId: number | null;
+  authorId: string;
+  createdAt: any;
+  parent: getPropLotProfile_propLotProfile_list_Comment_parent | null;
+  idea: getPropLotProfile_propLotProfile_list_Comment_idea | null;
 }
 
 export interface getPropLotProfile_propLotProfile_list_Idea_ideaStats {
@@ -71,7 +97,7 @@ export interface getPropLotProfile_propLotProfile_list_Idea {
   creatorId: string;
   description: string;
   votecount: number;
-  createdAt: string;
+  createdAt: any;
   ideaStats: getPropLotProfile_propLotProfile_list_Idea_ideaStats | null;
   closed: boolean;
   consensus: number | null;

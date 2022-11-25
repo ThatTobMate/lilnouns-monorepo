@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -13,17 +13,29 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Date: any;
 };
 
 export type Comment = {
   __typename?: 'Comment';
   authorId: Scalars['String'];
   body: Scalars['String'];
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
   id: Scalars['Int'];
+  idea?: Maybe<Idea>;
   ideaId: Scalars['Int'];
+  parent?: Maybe<CommentParent>;
   parentId?: Maybe<Scalars['Int']>;
   replies?: Maybe<Array<Comment>>;
+};
+
+export type CommentParent = {
+  __typename?: 'CommentParent';
+  authorId: Scalars['String'];
+  body: Scalars['String'];
+  createdAt: Scalars['Date'];
+  id: Scalars['Int'];
+  ideaId: Scalars['Int'];
 };
 
 export type FilterOption = {
@@ -45,7 +57,7 @@ export type Idea = {
   closed: Scalars['Boolean'];
   comments?: Maybe<Array<Comment>>;
   consensus?: Maybe<Scalars['Float']>;
-  createdAt: Scalars['String'];
+  createdAt: Scalars['Date'];
   creatorId: Scalars['String'];
   description: Scalars['String'];
   id: Scalars['Int'];
@@ -298,6 +310,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Comment: ResolverTypeWrapper<Comment>;
+  CommentParent: ResolverTypeWrapper<CommentParent>;
+  Date: ResolverTypeWrapper<Scalars['Date']>;
   FilterOption: ResolverTypeWrapper<FilterOption>;
   FilterType: FilterType;
   Float: ResolverTypeWrapper<Scalars['Float']>;
@@ -330,6 +344,8 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Comment: Comment;
+  CommentParent: CommentParent;
+  Date: Scalars['Date'];
   FilterOption: FilterOption;
   Float: Scalars['Float'];
   Idea: Idea;
@@ -358,13 +374,28 @@ export type ResolversParentTypes = {
 export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
   authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  idea?: Resolver<Maybe<ResolversTypes['Idea']>, ParentType, ContextType>;
   ideaId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  parent?: Resolver<Maybe<ResolversTypes['CommentParent']>, ParentType, ContextType>;
   parentId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   replies?: Resolver<Maybe<Array<ResolversTypes['Comment']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
+
+export type CommentParentResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentParent'] = ResolversParentTypes['CommentParent']> = {
+  authorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  ideaId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date';
+}
 
 export type FilterOptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['FilterOption'] = ResolversParentTypes['FilterOption']> = {
   icon?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -379,7 +410,7 @@ export type IdeaResolvers<ContextType = any, ParentType extends ResolversParentT
   closed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   comments?: Resolver<Maybe<Array<ResolversTypes['Comment']>>, ParentType, ContextType>;
   consensus?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   creatorId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -487,6 +518,8 @@ export type VoteResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   Comment?: CommentResolvers<ContextType>;
+  CommentParent?: CommentParentResolvers<ContextType>;
+  Date?: GraphQLScalarType;
   FilterOption?: FilterOptionResolvers<ContextType>;
   Idea?: IdeaResolvers<ContextType>;
   IdeaStats?: IdeaStatsResolvers<ContextType>;

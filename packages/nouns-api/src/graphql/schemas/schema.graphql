@@ -1,3 +1,5 @@
+scalar Date
+
 type Query {
   getIdea(options: IdeaInputOptions!): Idea
   getIdeas(options: IdeaInputOptions!): [Idea!]
@@ -112,10 +114,20 @@ type Comment {
   id: Int!
   body: String!
   ideaId: Int!
+  idea: Idea
+  parent: CommentParent
   parentId: Int
   authorId: String!
   replies: [Comment!]
-  createdAt: String!
+  createdAt: Date!
+}
+
+type CommentParent {
+  id: Int!
+  body: String!
+  ideaId: Int!
+  authorId: String!
+  createdAt: Date!
 }
 
 type IdeaStats {
@@ -136,7 +148,7 @@ type Idea {
   creatorId: String!
   comments: [Comment!]
   votecount: Int!
-  createdAt: String!
+  createdAt: Date!
   ideaStats: IdeaStats
   tags: [IdeaTags!]
   closed: Boolean!

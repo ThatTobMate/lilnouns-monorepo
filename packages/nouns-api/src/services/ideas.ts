@@ -49,7 +49,7 @@ const PROFILE_TAB_FILTERS: { [key: string]: any } = {
   DEFAULT: (_: string) => ({}),
 };
 
-const calculateVotes = (votes: any) => {
+export const calculateVotes = (votes: any) => {
   let count = 0;
   votes.forEach((vote: any) => {
     count = count + vote.direction * vote.voter.lilnounCount;
@@ -58,7 +58,7 @@ const calculateVotes = (votes: any) => {
   return count;
 };
 
-const calculateConsensus = (idea: Idea, voteCount: number) => {
+export const calculateConsensus = (idea: Idea, voteCount: number) => {
   if (!idea.tokenSupplyOnCreate) {
     return undefined;
   }

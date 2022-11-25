@@ -20,7 +20,7 @@ import {
   getTagParams,
 } from '../utils/queryUtils';
 
-export const resolveSortFilters = (root: any): PropLotFilter => {
+export const resolveSortFilters = (root: any, exclude?: string[]): PropLotFilter => {
   const SORT_FILTER_VALUES = {
     LATEST: buildFilterParam(FILTER_IDS.SORT, 'LATEST'),
     OLDEST: buildFilterParam(FILTER_IDS.SORT, 'OLDEST'),
@@ -64,6 +64,13 @@ export const resolveSortFilters = (root: any): PropLotFilter => {
     ],
   };
 
+  if (!!exclude) {
+    const filteredOptions = sortFilter.options.filter(
+      opt => !exclude.includes(opt.id.split('-')[1]),
+    );
+    sortFilter.options = filteredOptions;
+  }
+
   return sortFilter;
 };
 
@@ -95,7 +102,7 @@ const resolvers: IResolvers = {
 
       return ideas;
     },
-    sortFilter: resolveSortFilters,
+    sortFilter: root => resolveSortFilters(root),
     dateFilter: (root): PropLotFilter => {
       const options = Object.keys(DATE_FILTERS).map((key: string) => {
         return {

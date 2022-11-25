@@ -316,7 +316,7 @@ const IdeaPage = () => {
           </span>
           {` | ${
             creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-          } | ${moment(parseInt(data.getIdea.createdAt)).format('MMM Do YYYY')} ${
+          } | ${moment(data.getIdea.createdAt).format('MMM Do YYYY')} ${
             data.getIdea.closed ? '| closed' : ''
           }`}
         </div>
