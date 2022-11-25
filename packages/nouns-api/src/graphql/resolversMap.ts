@@ -5,10 +5,10 @@ import PropLotProfileListResolvers from './resolvers/PropLotProfileListResolvers
 
 import UserResolvers from './resolvers/UserResolvers';
 import { mergeDeep } from '@graphql-tools/utils';
-import { GraphQLDateTime } from 'graphql-iso-date';
+import { DateResolver } from 'graphql-scalars';
 
 const customScalarResolver = {
-  Date: GraphQLDateTime,
+  Date: DateResolver,
 };
 
 const resolverMap: IResolvers = mergeDeep([
