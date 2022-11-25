@@ -20,6 +20,28 @@ export const GET_PROPLOT_PROFILE_QUERY = gql`
         }
       }
       list {
+        ... on Comment {
+          id
+          body
+          ideaId
+          parentId
+          authorId
+          createdAt
+          parent {
+            id
+            body
+            ideaId
+            authorId
+            createdAt
+          }
+          idea {
+            id
+            title
+            creatorId
+            closed
+            consensus
+          }
+        }
         ... on Idea {
           id
           title

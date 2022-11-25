@@ -5,7 +5,6 @@ import { Alert } from 'react-bootstrap';
 import { useEthers } from '@usedapp/core';
 import { BigNumber as EthersBN } from 'ethers';
 import { useParams } from 'react-router-dom';
-import { gql } from '@apollo/client';
 
 import Davatar from '@davatar/react';
 
@@ -27,25 +26,8 @@ import { useShortAddress } from '../../utils/addressAndENSDisplayUtils';
 import useSyncURLParams from '../utils/useSyncUrlParams';
 import { StandaloneNounCircular } from '../../components/StandaloneNoun';
 import { GrayCircle } from '../../components/GrayCircle';
-
-// Subgraph query to fetch lil nouns by owner, not working locally?
-export const NOUNS_BY_OWNER_SUB = gql`
-  query account($id: String!) {
-    account(id: $id) {
-      id
-      nouns {
-        id
-        seed {
-          background
-          body
-          accessory
-          head
-          glasses
-        }
-      }
-    }
-  }
-`;
+import { NOUNS_BY_OWNER_SUB } from '../../wrappers/subgraph';
+import ProfileCommentRow from '../components/ProfileCommentRow';
 
 const ProfileCard = (props: { title: string; count: number }) => {
   return (
@@ -208,18 +190,10 @@ const PropLotUserProfile = () => {
   const buildProfileCards = (userStats: UserStats) => {
     return (
       <>
-        {userStats.totalIdeas && (
-          <ProfileCard count={userStats.totalIdeas} title={'Prop Lot submissions'} />
-        )}
-        {userStats.upvotesReceived && (
-          <ProfileCard count={userStats.upvotesReceived || 0} title={'Upvotes received'} />
-        )}
-        {typeof userStats.downvotesReceived === 'number' && (
-          <ProfileCard count={userStats.downvotesReceived || 0} title={'Downvotes received'} />
-        )}
-        {userStats.netVotesReceived && (
-          <ProfileCard count={userStats.netVotesReceived || 0} title={'Net votes'} />
-        )}
+        <ProfileCard count={userStats.totalIdeas || 0} title={'Prop Lot submissions'} />
+        <ProfileCard count={userStats.upvotesReceived || 0} title={'Upvotes received'} />
+        <ProfileCard count={userStats.downvotesReceived || 0} title={'Downvotes received'} />
+        <ProfileCard count={userStats.netVotesReceived || 0} title={'Net votes'} />
       </>
     );
   };
@@ -286,6 +260,14 @@ const PropLotUserProfile = () => {
                     nounBalance={nounBalanceWithDelegates}
                     disableControls={isAccountOwner}
                   />
+                </div>
+              );
+            }
+
+            if (listItem.__typename === 'Comment') {
+              return (
+                <div className="mb-[16px] space-y-4">
+                  <ProfileCommentRow comment={listItem} />
                 </div>
               );
             }

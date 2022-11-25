@@ -148,7 +148,7 @@ const IdeaRow = ({
               </span>{' '}
               {` | ${
                 creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-              } | ${moment(createdAt, 'x').format('MMM Do YYYY')}`}
+              } | ${moment(createdAt).format('MMM Do YYYY')}`}
             </span>
             <span className="flex mt-[16px] sm:mt-[0px] w-full sm:w-auto justify-self-end text-[#2b83f6] flex justify-end">
               <Button
