@@ -1,4 +1,7 @@
 import { prisma } from '../api';
+import { Comment } from '@prisma/client';
+import { calculateConsensus, calculateVotes } from './ideas';
+import { getIsClosed } from '../graphql/utils/queryUtils';
 
 const calculateAllVotes = (votes: any) => {
   let count = 0;
@@ -101,6 +104,52 @@ class UserService {
 
       return user;
     } catch (e: any) {
+      throw e;
+    }
+  }
+
+  static async getUserComments({ sortBy, wallet }: { sortBy?: string; wallet: string }) {
+    const SORT_FILTERS: { [key: string]: any } = {
+      LATEST: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+      OLDEST: {
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
+    };
+
+    try {
+      const comments = await prisma.comment.findMany({
+        where: {
+          authorId: wallet,
+        },
+        ...SORT_FILTERS[sortBy || 'LATEST'],
+        include: {
+          idea: {
+            include: {
+              tags: true,
+            },
+          },
+          parent: true,
+        },
+      });
+
+      const commentData = comments.map((comment: any) => {
+        if (comment.idea) {
+          const votecount = calculateVotes(comment.idea.votes || []);
+          const consensus = calculateConsensus(comment.idea, votecount);
+          const closed = getIsClosed(comment.idea);
+          return { ...comment, idea: { ...comment.idea, votecount, consensus, closed } };
+        }
+        return comment;
+      });
+
+      return commentData;
+    } catch (e) {
       throw e;
     }
   }

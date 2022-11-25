@@ -1,5 +1,5 @@
 import { IResolvers } from '@graphql-tools/utils';
-import { User, Vote, Idea as PrismaIdea } from '@prisma/client';
+import { User, Vote, Idea as PrismaIdea, Comment as PrismaComment } from '@prisma/client';
 import IdeasService from '../../services/ideas';
 import UserService from '../../services/user';
 import {
@@ -25,6 +25,7 @@ type UserCounts = {
 };
 
 type VoteWithIdea = Vote & { idea: PrismaIdea };
+type Comment = PrismaComment & { idea?: Idea };
 
 type PrismaUser = User & { _count: UserCounts; votes: VoteWithIdea[] };
 
@@ -100,12 +101,12 @@ const resolvers: IResolvers = {
       }
 
       if (tab === 'COMMENTS') {
-        const ideas: Idea[] = await IdeasService.findWhere({
+        const comments: Comment[] = await UserService.getUserComments({
           sortBy: parseFilterParam(root.sortParam)?.value,
           wallet: root.wallet,
-          tab,
         });
-        listItems = [...ideas];
+
+        listItems = [...comments];
       }
 
       if (['UP_VOTES', 'DOWN_VOTES'].includes(tab || '')) {
@@ -119,7 +120,10 @@ const resolvers: IResolvers = {
 
       return listItems;
     },
-    sortFilter: resolveSortFilters,
+    sortFilter: root => {
+      const tab = parseFilterParam(root.tabParam)?.value;
+      return resolveSortFilters(root, tab === 'COMMENTS' ? ['VOTES_DESC', 'VOTES_ASC'] : undefined);
+    },
     tabFilter: (root): PropLotFilter => {
       const options = Object.keys(PROFILE_TAB_FILTERS)
         .filter((key: string) => PROFILE_TAB_FILTERS[key].active(root.user))
