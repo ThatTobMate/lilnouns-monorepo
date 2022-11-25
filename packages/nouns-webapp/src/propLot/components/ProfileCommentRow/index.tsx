@@ -39,7 +39,7 @@ const ProfileCommentRow = ({ comment }: { comment: Comment }) => {
   const lilNounData = getNounsByOwnerDataSub?.account?.nouns || [];
 
   return (
-    <Card className="border border-[#E2E3E8] font-propLot !rounded-[16px] box-border bg-white">
+    <Card className="border border-[#E2E3E8] !rounded-[16px] box-border bg-white">
       <Card.Header className="bg-white font-semibold text-[#8C8D92] text-[12px] !rounded-[16px] !border-0">
         <div className="flex flex-1 flex-row items-center gap-[8px] border-solid !border-[#E2E3E8] border-b-1 border-l-0 border-r-0 border-t-0 pb-[8px]">
           <span className="flex text-[#8C8D92] overflow-hidden gap-[8px] items-center">
