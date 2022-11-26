@@ -76,6 +76,7 @@ const ProfileLilNounDisplay = ({
               .map((lilNoun: any) => {
                 return (
                   <StandaloneNounCircular
+                    key={lilNoun.id}
                     nounId={EthersBN.from(lilNoun.id)}
                     styleOverride="!w-[48px] !h-[48px]"
                   />
@@ -267,7 +268,7 @@ const PropLotUserProfile = () => {
             if (listItem.__typename === 'Comment') {
               return (
                 <div className="mb-[16px] space-y-4">
-                  <ProfileCommentRow comment={listItem} />
+                  <ProfileCommentRow key={`comment-${listItem.id}`} comment={listItem} />
                 </div>
               );
             }
