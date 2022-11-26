@@ -70,7 +70,7 @@ const ProfileLilNounDisplay = ({
   return (
     <div className="flex flex-col justify-end gap-[16px]">
       {Boolean(lilNounData?.length) ? (
-        <div className="flex flex-1 flex-row-reverse gap-[4px] justify-center">
+        <div className="flex flex-1 flex-row-reverse gap-[4px] justify-center sm:justify-start">
           <>
             {lilNounData
               .map((lilNoun: any) => {
