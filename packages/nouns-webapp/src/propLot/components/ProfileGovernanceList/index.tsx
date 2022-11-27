@@ -22,6 +22,7 @@ const filter: GenericFilter = {
   id: 'GOVERNANCE',
   type: FilterTyeEnum.SINGLE_SELECT,
   label: 'Tabs',
+  __typename: 'PropLotFilter',
   options: [
     {
       id: 'YES',
@@ -29,6 +30,7 @@ const filter: GenericFilter = {
       selected: true,
       value: 'YES',
       icon: null,
+      __typename: 'FilterOption',
     },
     {
       id: 'NO',
@@ -36,6 +38,7 @@ const filter: GenericFilter = {
       selected: false,
       value: 'NO',
       icon: null,
+      __typename: 'FilterOption',
     },
     {
       id: 'ABSTAINED',
@@ -43,6 +46,7 @@ const filter: GenericFilter = {
       selected: false,
       value: 'ABSTAINED',
       icon: null,
+      __typename: 'FilterOption',
     },
     {
       id: 'SUBMITTED',
@@ -50,6 +54,7 @@ const filter: GenericFilter = {
       selected: false,
       value: 'SUBMITTED',
       icon: null,
+      __typename: 'FilterOption',
     },
   ],
 };

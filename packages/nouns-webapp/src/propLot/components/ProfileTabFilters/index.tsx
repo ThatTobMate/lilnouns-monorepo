@@ -15,12 +15,14 @@ export type GenericFilter = {
   id: string;
   type: FilterType;
   label: string | null;
+  __typename: 'PropLotFilter';
   options: {
     id: string;
     label: string | null;
     selected: boolean;
     value: string;
     icon: string | null;
+    __typename: 'FilterOption';
   }[];
 };
 
