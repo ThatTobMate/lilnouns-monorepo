@@ -80,11 +80,6 @@ const useProfileGovernanceData = () => {
         clientName: 'NounsDAOSnapshot',
       },
       onCompleted: data => {
-        // const snapshotProposalChoiceMap: { [key: string]: number } = {
-        //   Against: 0,
-        //   For: 1,
-        //   Abstain: 2,
-        // };
         const snapshotProposalData =
           data?.votes.map((vote: any) => {
             return { choice: vote.choice, reason: vote.reason, body: vote.proposal.body };
@@ -190,7 +185,7 @@ const useProfileGovernanceData = () => {
     if (bigNounProposals.length) {
       setCategorisedProposals(proposals);
     }
-  }, [bigNounProposals]);
+  }, [bigNounProposals, lilNounProposals]);
 
   return {
     isLoading: loadingLilNounsHistory || loadingSnapshot || loadingBigNounsHistory,
