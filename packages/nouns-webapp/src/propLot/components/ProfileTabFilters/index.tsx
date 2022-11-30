@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState, forwardRef, ReactNode, MouseEvent } from 'react';
 import { buildSelectedFilters, updateSelectedFilters } from '../../utils/queryFilterHelpers';
 
 import {
@@ -26,8 +26,42 @@ export type GenericFilter = {
   }[];
 };
 
-type Filter = TagFilter | SortFilter | DateFilter | GenericFilter;
+type Filter = TagFilter | SortFilter | DateFilter;
 type FilterOptions = TagFilterOptions | SortFilterOptions | DateFilterOptions;
+
+export const TabWrapper = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="flex flex-1 flex-row items-center overflow-scroll pt-[8px] gap-[16px]">
+      {children}
+    </div>
+  );
+};
+
+export const TabOption = ({
+  id,
+  isSelected,
+  onClick,
+  children,
+}: {
+  id: string;
+  isSelected: boolean;
+  onClick: (e: MouseEvent) => void;
+  children: ReactNode;
+}) => {
+  return (
+    <div
+      onClick={onClick}
+      key={id}
+      className={`${
+        isSelected
+          ? 'text-[#2B83F6] underline underline-offset-8 decoration-2'
+          : 'hover:text-[#2B83F6] pb-[6px]'
+      } whitespace-nowrap cursor-pointer text-[#8C8D92] flex-1 sm:flex-none font-semibold font-propLot pb-[2px]`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const ProfileTabFilters = ({
   filter,
@@ -50,27 +84,23 @@ const ProfileTabFilters = ({
   };
 
   return (
-    <div className="flex flex-1 flex-row items-center overflow-scroll pt-[8px] gap-[16px]">
+    <TabWrapper>
       {filter.options.map(opt => {
         const isSelected = selectedFilters.some(selectedFilter => selectedFilter === opt.value);
         return (
-          <div
-            onClick={evt => {
-              evt.preventDefault();
+          <TabOption
+            id={opt.id}
+            isSelected={isSelected}
+            onClick={(e: MouseEvent) => {
+              e.preventDefault();
               handleUpdateFilters(opt, isSelected);
             }}
-            key={opt.id}
-            className={`${
-              isSelected
-                ? 'text-[#2B83F6] underline underline-offset-8 decoration-2'
-                : 'hover:text-[#2B83F6] pb-[6px]'
-            } whitespace-nowrap cursor-pointer text-[#8C8D92] flex-1 sm:flex-none font-semibold font-propLot pb-[2px]`}
           >
             {opt.label}
-          </div>
+          </TabOption>
         );
       })}
-    </div>
+    </TabWrapper>
   );
 };
 
