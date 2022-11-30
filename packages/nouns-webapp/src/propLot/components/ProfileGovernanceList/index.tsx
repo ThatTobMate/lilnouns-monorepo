@@ -1,4 +1,5 @@
 import { Spinner, Alert } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 
 import { ProposalState } from '../../../wrappers/nounsDao';
 import { bigNounsPropStatus } from '../../../components/Proposals';
@@ -55,9 +56,16 @@ const ProposalWrapper = ({
 }) => {
   const breakpoint = useBreakpoint();
   const isMobile = breakpoint === 'S';
+  const history = useHistory();
+  const onClick = () => {
+    type === 'LIL_NOUN' ? history.push(`/vote/${id}`) : history.push(`/vote/nounsdao/${id}`);
+  };
 
   const mobileRow = (
-    <div className="flex flex-col border border-[#e2e3e8] rounded-lg cursor-pointer pt-[24px] pb-[24px] px-3">
+    <div
+      onClick={onClick}
+      className="flex flex-col border border-[#e2e3e8] rounded-lg cursor-pointer pt-[24px] pb-[24px] px-3"
+    >
       <div className="font-propLot font-bold text-[18px] flex flex-row flex-1 justify-content-between align-items-start">
         <span className="flex flex-col sm:flex-row text-[#8C8D92] overflow-hidden gap-[8px]">
           <span className="flex flex-row gap-[8px] flex-1 justify-content-start align-items-start">
@@ -77,7 +85,10 @@ const ProposalWrapper = ({
   );
 
   const desktopRow = (
-    <div className="flex flex-col border border-[#e2e3e8] rounded-lg cursor-pointer pt-[24px] pb-[24px] px-3">
+    <div
+      onClick={onClick}
+      className="flex flex-col border border-[#e2e3e8] rounded-lg cursor-pointer pt-[24px] pb-[24px] px-3"
+    >
       <div className="font-propLot font-bold text-[18px] flex flex-row flex-1 justify-content-start align-items-start">
         <div className="flex flex-1 flex-col">
           <div className="flex flex-1 gap-[8px]">
