@@ -1,10 +1,7 @@
 import { useEthers } from '@usedapp/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretUp, faCaretDown, faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import Davatar from '@davatar/react';
 import { useApiError } from '../../../hooks/useApiError';
 import { useMutation } from '@apollo/client';
-import carat from '../../../assets/icons/Carat.svg';
 import { useAuth } from '../../../hooks/useAuth';
 
 import propLotClient from '../../graphql/config';
@@ -104,7 +101,7 @@ const IdeaVoteControls = ({
   return (
     <>
       {withAvatars && (
-        <span className="flex self-center justify-end pl-2 mr-8">
+        <span className="flex self-center justify-end pl-2 mr-2">
           {avatarVotes.map((vote, i) => (
             <span className={i < avatarVotes.length - 1 ? '-mr-2' : ''}>
               <Davatar
@@ -119,7 +116,10 @@ const IdeaVoteControls = ({
           ))}
         </span>
       )}
-      <div className="flex flex-[row] sm:flex-col items-center sm:items-end justify-center sm:justify-start space-x-3 sm:space-x-0 sm:space-y-1">
+      <span className="font-bold text-lg sm:text-2xl mr-4 min-w-[75px] text-right hidden sm:block">
+        {calculatedVoteCount}
+      </span>
+      <div className="flex flex-[row] sm:flex-col items-center sm:items-end justify-center sm:justify-between space-x-3 sm:space-x-0 sm:space-y-1 sm:h-[65px]">
         <svg
           onClick={e => {
             e.stopPropagation();
@@ -138,7 +138,9 @@ const IdeaVoteControls = ({
             fill={hasVotes && userHasUpVote ? 'text-blue-500' : 'text-[#8c8d92]'}
           />
         </svg>
-        <span className="font-bold text-lg sm:text-2xl">{calculatedVoteCount}</span>
+        <span className="font-bold text-lg sm:text-2xl mr-4 sm:min-w-[75px] text-right block sm:hidden">
+          {calculatedVoteCount}
+        </span>
         <svg
           width="20"
           height="12"

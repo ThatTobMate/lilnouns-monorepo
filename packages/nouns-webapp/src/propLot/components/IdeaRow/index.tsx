@@ -73,10 +73,10 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
       <div className="flex flex-1 flex-col">
         <div className="flex flex-1">
           <span className="flex text-[#8C8D92] overflow-hidden">
-            <span className="mr-[16px]">{id}</span>
-            <span className="truncate">{ens || shortAddress}</span>
+            <span className="mr-[8px] w-[48px]">{id}</span>
+            <span className="truncate mr-[8px] w-[134px]">{ens || shortAddress}</span>
           </span>
-          <span className="text-[#212529] flex flex-1 ml-8">{title}</span>
+          <span className="text-[#212529] flex flex-1">{title}</span>
         </div>
         {tags && tags.length > 0 && (
           <div className="flex flex-row items-center flex-wrap gap-[8px] mt-[16px]">
@@ -101,7 +101,7 @@ const IdeaRow = ({ idea, nounBalance }: { idea: Idea; nounBalance: number }) => 
           </div>
         )}
       </div>
-      <div className="flex justify-self-end">
+      <div className="flex justify-self-end items-center">
         <IdeaVoteControls
           idea={idea}
           nounBalance={nounBalance}

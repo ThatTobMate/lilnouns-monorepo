@@ -60,7 +60,7 @@ const IdeaCard = ({
         <span className="truncate">{ens || shortAddress}</span>
       </span>
       <span className="text-[#212529] font-normal text-2xl flex flex-1 lodrina ml-6">{title}</span>
-      <div className="flex justify-self-end">
+      <div className="flex justify-self-end items-center">
         <IdeaVoteControls
           idea={idea}
           voteOnIdea={voteOnIdea}
