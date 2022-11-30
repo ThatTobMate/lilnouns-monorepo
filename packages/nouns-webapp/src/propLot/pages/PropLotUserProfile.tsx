@@ -1,4 +1,4 @@
-import { Col, Row, Button } from 'react-bootstrap';
+import { Col, Row, Button, Spinner } from 'react-bootstrap';
 import Section from '../../layout/Section';
 import { v4 } from 'uuid';
 import { Alert } from 'react-bootstrap';
@@ -30,11 +30,21 @@ import { NOUNS_BY_OWNER_SUB } from '../../wrappers/subgraph';
 import ProfileCommentRow from '../components/ProfileCommentRow';
 import ProfileGovernanceList from '../components/ProfileGovernanceList';
 
-const ProfileCard = (props: { title: string; count: number }) => {
+import useProfileGovernanceData, { TabFilterOptionValues } from '../hooks/useProfileGovernanceData';
+
+const ProfileCard = (props: { title: string; count: number; isLoading?: boolean }) => {
   return (
     <div className="font-propLot whitespace-nowrap py-[8px] px-[16px] gap-[4px] sm:p-[16px] sm:gap-[8px] bg-white border-solid border border-[#e2e3e8] rounded-[16px] box-border flex flex-1 flex-col justify-start">
-      <span className="font-semibold text-[12px] text-[#8C8D92]">{props.title}</span>
-      <span className="font-extrabold text-[24px] text-[#212529]">{props.count}</span>
+      {props.isLoading ? (
+        <div className="flex flex-1 justify-center mt-[18px]">
+          <Spinner animation="border" />
+        </div>
+      ) : (
+        <>
+          <span className="font-semibold text-[12px] text-[#8C8D92]">{props.title}</span>
+          <span className="font-extrabold text-[24px] text-[#212529]">{props.count}</span>
+        </>
+      )}
     </div>
   );
 };
@@ -114,6 +124,11 @@ const PropLotUserProfile = () => {
   const { id } = useParams() as { id: string };
   const { account } = useEthers();
   const { getAuthHeader } = useAuth();
+  const {
+    isLoading: isLoadingGovernance,
+    snapshotProposalData,
+    categorisedProposals,
+  } = useProfileGovernanceData();
 
   const [getPropLotProfileQuery, { data, refetch }] = useLazyQuery<getPropLotProfile>(
     GET_PROPLOT_PROFILE_QUERY,
@@ -199,6 +214,13 @@ const PropLotUserProfile = () => {
 
   const ens = useReverseENSLookUp(id);
   const shortAddress = useShortAddress(id);
+  const calculateOnchainVotes = () => {
+    const yesVotes = categorisedProposals[TabFilterOptionValues.YES]?.length || 0;
+    const noVotes = categorisedProposals[TabFilterOptionValues.NO]?.length || 0;
+    const abstainedVotes = categorisedProposals[TabFilterOptionValues.ABSTAINED]?.length || 0;
+
+    return yesVotes + noVotes + abstainedVotes;
+  };
 
   const buildProfileCards = (userStats: UserStats) => {
     return (
@@ -207,6 +229,16 @@ const PropLotUserProfile = () => {
         <ProfileCard count={userStats.upvotesReceived || 0} title={'Upvotes received'} />
         <ProfileCard count={userStats.downvotesReceived || 0} title={'Downvotes received'} />
         <ProfileCard count={userStats.netVotesReceived || 0} title={'Net votes'} />
+        <ProfileCard
+          count={categorisedProposals[TabFilterOptionValues.SUBMITTED]?.length || 0}
+          title={'On-chain proposals'}
+          isLoading={isLoadingGovernance}
+        />
+        <ProfileCard
+          count={calculateOnchainVotes()}
+          title={'On-chain votes cast'}
+          isLoading={isLoadingGovernance}
+        />
       </>
     );
   };
@@ -269,7 +301,11 @@ const PropLotUserProfile = () => {
                   })}
                 </div>
               </div>
-              <ProfileGovernanceList />
+              <ProfileGovernanceList
+                isLoadingGovernance={isLoadingGovernance}
+                snapshotProposalData={snapshotProposalData}
+                categorisedProposals={categorisedProposals}
+              />
             </>
           )}
 
