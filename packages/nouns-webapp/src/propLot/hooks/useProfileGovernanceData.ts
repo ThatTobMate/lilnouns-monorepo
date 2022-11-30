@@ -1,7 +1,7 @@
 import { formatSubgraphProposal } from '../../wrappers/nounsDao';
 import { formatBigNounSubgraphProposal } from '../../wrappers/bigNounsDao';
 import { useLazyQuery } from '@apollo/client';
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -50,9 +50,6 @@ const useProfileGovernanceData = () => {
   const { id } = useParams() as { id: string };
   const snapshotProposalVoteMap = useRef(
     {} as { [key: string]: { voted: number; reason: string } },
-  );
-  const [categorisedProposals, setCategorisedProposals] = useState(
-    buildInitialCategorisedProposalState(),
   );
   const blockNumber = useBlockNumber();
   const bigNounsTimestamp = useBlockTimestamp(blockNumber);
@@ -128,17 +125,20 @@ const useProfileGovernanceData = () => {
 
   const snapshotProposalData = nounsSnapshotHistory?.votes.map((vote: any) => vote.proposal) || [];
 
-  const lilNounProposals =
-    lilNounGovernanceHistory?.votes.map((vote: any) => {
-      const proposal = formatSubgraphProposal(vote.proposal, blockNumber, timestamp);
-      return {
-        type: 'LIL_NOUN',
-        proposal,
-        createdAt: proposal.createdBlock,
-        voted: vote.supportDetailed,
-        reason: vote.reason || '',
-      };
-    }) || [];
+  const lilNounProposals = useMemo(() => {
+    return (
+      lilNounGovernanceHistory?.votes.map((vote: any) => {
+        const proposal = formatSubgraphProposal(vote.proposal, blockNumber, timestamp);
+        return {
+          type: 'LIL_NOUN',
+          proposal,
+          createdAt: proposal.createdBlock,
+          voted: vote.supportDetailed,
+          reason: vote.reason || '',
+        };
+      }) || []
+    );
+  }, [lilNounGovernanceHistory]);
 
   const bigNounProposals = useMemo(() => {
     return (
@@ -155,8 +155,8 @@ const useProfileGovernanceData = () => {
     );
   }, [bigNounProposalData, snapshotProposalVoteMap]);
 
-  useEffect(() => {
-    const proposals = [...lilNounProposals, ...bigNounProposals].reduce((acc, curr) => {
+  const categorisedProposals = useMemo(() => {
+    return [...lilNounProposals, ...bigNounProposals].reduce((acc, curr) => {
       if (curr.voted === 1) {
         acc[TabFilterOptionValues.YES] = [...(acc[TabFilterOptionValues.YES] || []), curr];
       }
@@ -180,12 +180,8 @@ const useProfileGovernanceData = () => {
       }
 
       return acc;
-    }, categorisedProposals);
-
-    if (bigNounProposals.length) {
-      setCategorisedProposals(proposals);
-    }
-  }, [bigNounProposals, lilNounProposals]);
+    }, buildInitialCategorisedProposalState());
+  }, [lilNounProposals, bigNounProposals]);
 
   return {
     isLoading: loadingLilNounsHistory || loadingSnapshot || loadingBigNounsHistory,
