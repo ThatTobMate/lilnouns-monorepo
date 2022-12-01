@@ -92,7 +92,7 @@ const ProposalWrapper = ({
       <div className="font-propLot font-bold text-[18px] flex flex-row flex-1 justify-content-start align-items-start">
         <div className="flex flex-1 flex-col">
           <div className="flex flex-1 gap-[8px]">
-            <span className="flex flex-1 text-[#8C8D92] gap-[8px] overflow-hidden">
+            <span className="flex text-[#8C8D92] gap-[8px] overflow-hidden">
               <span>{id}</span>
               <span className="truncate">
                 {type === 'LIL_NOUN' ? 'Lil Nouns DAO' : 'Nouns DAO'}
