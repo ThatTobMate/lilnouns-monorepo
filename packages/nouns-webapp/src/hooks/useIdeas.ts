@@ -48,6 +48,7 @@ export interface Idea {
   votecount: number;
   createdAt: string;
   closed: boolean;
+  deleted: boolean;
   _count?: {
     comments: number;
   };
@@ -60,6 +61,7 @@ export interface Comment {
   parentId: number | null;
   authorId: string;
   replies: Reply[];
+  deleted: boolean;
   createdAt: string;
 }
 
@@ -323,45 +325,86 @@ export const useIdeas = () => {
     }
   };
 
-  const deleteComment = async (commentId: number) => {
+  const deleteComment = (ideaId: number, commentId: number) => {
     try {
-      const res = await fetch(`${HOST}/comment/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          ...getAuthHeader(),
+      mutate(
+        `${HOST}/idea/${ideaId}/comments`,
+        async () => {
+          const response = await fetch(`${HOST}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+              ...getAuthHeader(),
+            },
+          });
+          if (!response.ok) throw new Error('Failed to delete comment');
+          return response.json();
         },
-      });
+        {
+          optimisticData: ({ data }: { data: Comment[] }) => {
+            const comments = data.map(comment => {
+              if (comment.id === commentId) {
+                comment.deleted = true;
+              }
+              return comment;
+            });
 
-      if (!res.ok) {
-        throw new Error('Failed to delete Idea');
-      }
+            return { data: comments };
+          },
+          rollbackOnError: true,
+          populateCache: ({ data }: { data: Comment }, currentData: { data: Comment[] }) => {
+            return { data: currentData.data };
+          },
+          revalidate: true,
+        },
+      );
     } catch (e: any) {
       const error = {
-        message: e.message || 'Failed to delete comment!',
+        message: e.message || 'Failed to delete your comment!',
         status: e.status || 500,
       };
       setError(error);
     }
   };
 
-  const deleteIdea = async (id: number) => {
+  const deleteIdea = (id: number) => {
     try {
-      const res = await fetch(`${HOST}/idea/${id}`, {
-        method: 'DELETE',
-        headers: {
-          ...getAuthHeader(),
+      mutate(
+        `${HOST}/ideas`,
+        async () => {
+          const response = await fetch(`${HOST}/idea/${id}`, {
+            method: 'DELETE',
+            headers: {
+              ...getAuthHeader(),
+            },
+          });
+          if (!response.ok) throw new Error('Failed to delete idea');
+          const idea = await response.json();
+          return idea.data;
         },
-      });
+        {
+          // optimisticData: (data: Idea[], data2: Idea) => {
+          //   console.log('optomistic data', data);
+          //   console.log('other', data2);
+          //   const ideas = data.map(idea => {
+          //     if (idea.id === id) {
+          //       idea.deleted = true;
+          //     }
+          //     return idea;
+          //   });
 
-      if (!res.ok) {
-        throw new Error('Failed to delete Idea');
-      }
-
-      history.push(`/ideas`);
-      return res;
+          //   return { data: ideas };
+          // },
+          rollbackOnError: true,
+          populateCache: ({ data }: { data: Idea }, currentData: { data: Idea[] }) => {
+            return { data: currentData.data };
+          },
+          revalidate: true,
+        },
+      );
     } catch (e: any) {
+      console.error(e);
       const error = {
-        message: e.message || 'Failed to delete your idea!',
+        message: e.message || 'Failed to delete your comment!',
         status: e.status || 500,
       };
       setError(error);
@@ -404,14 +447,14 @@ export const useIdeas = () => {
         submitIdea(data);
       }
     },
-    deleteComment: async (commentId: number) => {
+    deleteComment: async (ideaId: number, commentId: number) => {
       if (!isLoggedIn()) {
         try {
           await triggerSignIn();
-          await deleteComment(commentId);
+          await deleteComment(ideaId, commentId);
         } catch (e) {}
       } else {
-        await deleteComment(commentId);
+        await deleteComment(ideaId, commentId);
       }
     },
     deleteIdea: async (ideaId: number) => {
