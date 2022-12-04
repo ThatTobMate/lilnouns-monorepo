@@ -8,6 +8,7 @@ import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { useReverseENSLookUp } from '../../../utils/ensLookup';
 import { useShortAddress } from '../../../utils/addressAndENSDisplayUtils';
 import { useIdeas, CommentFormData, Comment as CommentType } from '../../../hooks/useIdeas';
+import { useNotifications } from '../../../hooks/useNotifications';
 import { useAuth } from '../../../hooks/useAuth';
 import { useAccountVotes } from '../../../wrappers/nounToken';
 import moment from 'moment';
@@ -222,6 +223,7 @@ const IdeaPage = () => {
   const history = useHistory();
   const { account } = useEthers();
   const { getComments, commentOnIdea } = useIdeas();
+  const { sendNewCommentNotification } = useNotifications();
   const { comments, error } = getComments(id);
   const { getAuthHeader } = useAuth();
 
@@ -252,6 +254,11 @@ const IdeaPage = () => {
       ideaId: parseInt(id),
       authorId: account,
     } as CommentFormData);
+    await sendNewCommentNotification({
+      idea_index: parseInt(id),
+      comment_body: comment,
+      author: account || '',
+    });
     setComment('');
   };
 
