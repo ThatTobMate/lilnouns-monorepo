@@ -157,9 +157,6 @@ const Comment = ({
             className="text-red-500 cursor-pointer"
             onClick={async () => {
               await deleteComment(Number(id), comment.id);
-              setTimeout(() => {
-                refetch();
-              }, 1000);
             }}
           >
             Delete

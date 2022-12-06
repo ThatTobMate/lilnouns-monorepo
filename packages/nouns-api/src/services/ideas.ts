@@ -340,10 +340,14 @@ class IdeasService {
         },
         include: {
           replies: {
+            where: { deleted: false },
             include: {
               replies: {
+                where: { deleted: false },
                 include: {
-                  replies: true,
+                  replies: {
+                    where: { deleted: false },
+                  },
                 },
               },
             },
