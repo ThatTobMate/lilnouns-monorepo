@@ -368,6 +368,11 @@ const PropLotUserProfile = () => {
                         key={`idea-${listItem.id}`}
                         nounBalance={nounBalanceWithDelegates}
                         disableControls={isAccountOwner}
+                        refetch={() =>
+                          refetch({
+                            options: { wallet: id, requestUUID: v4(), filters: appliedFilters },
+                          })
+                        }
                       />
                     </div>
                   );

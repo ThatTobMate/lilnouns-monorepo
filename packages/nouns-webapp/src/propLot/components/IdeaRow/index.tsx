@@ -8,6 +8,8 @@ import IdeaVoteControls from '../IdeaVoteControls';
 import { getPropLot_propLot_ideas as Idea } from '../../graphql/__generated__/getPropLot';
 import { virtualTagColorMap } from '../../../utils/virtualTagColors';
 import { Button } from 'react-bootstrap';
+import { useEthers } from '@usedapp/core';
+import { useIdeas } from '../../../hooks/useIdeas';
 
 const useBreakpoint = createBreakpoint({ XL: 1440, L: 940, M: 650, S: 540 });
 
@@ -15,11 +17,14 @@ const IdeaRow = ({
   idea,
   nounBalance,
   disableControls,
+  refetch,
 }: {
   idea: Idea;
   nounBalance: number;
   disableControls?: boolean;
+  refetch: () => void;
 }) => {
+  const { account } = useEthers();
   const breakpoint = useBreakpoint();
   const history = useHistory();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -29,6 +34,7 @@ const IdeaRow = ({
   const ens = useReverseENSLookUp(creatorId);
   const shortAddress = useShortAddress(creatorId);
   const creatorLilNoun = votes?.find(vote => vote.voterId === creatorId)?.voter?.lilnounCount;
+  const { deleteIdea } = useIdeas();
 
   const mobileHeading = (
     <>
@@ -149,6 +155,21 @@ const IdeaRow = ({
               {` | ${
                 creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
               } | ${moment(createdAt).format('MMM Do YYYY')}`}
+              {account && account.toLowerCase() === idea.creatorId.toLowerCase() && (
+                <span
+                  onClick={async event => {
+                    // stop propagation to prevent the card from closing
+                    event.stopPropagation();
+                    await deleteIdea(idea.id);
+                    setTimeout(() => {
+                      refetch();
+                    }, 500);
+                  }}
+                  className="text-red-500 self-end font-bold ml-2"
+                >
+                  Delete submission
+                </span>
+              )}
             </span>
             <span className="mt-[16px] sm:mt-[0px] w-full sm:w-auto justify-self-end text-[#2b83f6] flex justify-end">
               <Button

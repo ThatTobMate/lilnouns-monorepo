@@ -84,6 +84,9 @@ class IdeasService {
       // });
 
       const ideas = await prisma.idea.findMany({
+        where: {
+          deleted: false,
+        },
         include: {
           votes: {
             include: {
@@ -129,6 +132,7 @@ class IdeasService {
       const profileFilters: any = PROFILE_TAB_FILTERS[tab || 'DEFAULT'](wallet);
       const ideas = await prisma.idea.findMany({
         where: {
+          deleted: false,
           createdAt: {
             gte: dateRange.gte,
             lte: dateRange.lte,
@@ -197,6 +201,10 @@ class IdeasService {
 
       if (!idea) {
         throw new Error('Idea not found');
+      }
+
+      if (idea.deleted) {
+        throw new Error('Idea has been deleted!');
       }
 
       const votecount = calculateVotes(idea.votes);
@@ -274,6 +282,16 @@ class IdeasService {
         throw new Error('Idea has been closed');
       }
 
+      const idea = await prisma.idea.findUnique({
+        where: {
+          id: data.ideaId,
+        },
+      });
+
+      if (idea?.deleted) {
+        throw new Error('Idea has been deleted');
+      }
+
       const vote = prisma.vote.upsert({
         where: {
           ideaId_voterId: {
@@ -320,13 +338,18 @@ class IdeasService {
         where: {
           ideaId: id,
           parentId: null,
+          deleted: false,
         },
         include: {
           replies: {
+            where: { deleted: false },
             include: {
               replies: {
+                where: { deleted: false },
                 include: {
-                  replies: true,
+                  replies: {
+                    where: { deleted: false },
+                  },
                 },
               },
             },
@@ -352,6 +375,12 @@ class IdeasService {
         throw new Error('Idea has been closed');
       }
 
+      const isDeleted = await this.isIdeaDeleted(data.ideaId);
+
+      if (isDeleted) {
+        throw new Error('Idea has been deleted');
+      }
+
       const comment = prisma.comment.create({
         data: {
           body: data.body,
@@ -367,6 +396,16 @@ class IdeasService {
     }
   }
 
+  static async isIdeaDeleted(id: number) {
+    const idea = await prisma.idea.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return idea?.deleted;
+  }
+
   static async isIdeaClosed(id: number) {
     // Load idea first to check if it's been closed before allowing updates.
     const idea = await prisma.idea.findUnique({
@@ -380,6 +419,40 @@ class IdeasService {
     }
 
     return getIsClosed(idea);
+  }
+
+  static async deleteIdea(id: number) {
+    try {
+      const idea = await prisma.idea.update({
+        where: {
+          id,
+        },
+        data: {
+          deleted: true,
+        },
+      });
+
+      return idea;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async deleteComment(id: number) {
+    try {
+      const comment = await prisma.comment.update({
+        where: {
+          id,
+        },
+        data: {
+          deleted: true,
+        },
+      });
+
+      return comment;
+    } catch (e) {
+      throw e;
+    }
   }
 }
 
