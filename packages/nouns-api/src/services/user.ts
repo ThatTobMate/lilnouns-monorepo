@@ -1,41 +1,7 @@
 import { prisma } from '../api';
 import { Comment } from '@prisma/client';
-import { calculateConsensus, calculateVotes } from './ideas';
-import { getIsClosed } from '../graphql/utils/queryUtils';
-
-const calculateAllVotes = (votes: any) => {
-  let count = 0;
-  let upvotes = 0;
-  let downvotes = 0;
-  const calc = (acc: number, vote: any) => acc + vote.direction * vote.voter.lilnounCount;
-  votes.forEach((vote: any) => {
-    if (vote.direction === 1) {
-      upvotes = calc(upvotes, vote);
-    }
-    if (vote.direction === -1) {
-      downvotes = calc(downvotes, vote);
-    }
-    count = calc(count, vote);
-  });
-
-  return { count, upvotes, downvotes };
-};
-
-const calculateNetVotes = (ideas: any) => {
-  let netVotes = 0;
-  let netUpvotes = 0;
-  let netDownvotes = 0;
-
-  ideas.forEach((idea: any) => {
-    const { count, upvotes, downvotes } = calculateAllVotes(idea.votes);
-
-    netVotes += count;
-    netUpvotes += upvotes;
-    netDownvotes += downvotes;
-  });
-
-  return { netVotes, netUpvotes, netDownvotes };
-};
+import { calculateConsensus } from './ideas';
+import { getIsClosed, calculateNetVotes, calculateAllVotes } from '../graphql/utils/queryUtils';
 
 class UserService {
   static async allUsers() {
@@ -145,9 +111,16 @@ class UserService {
 
       const commentData = comments.map((comment: any) => {
         if (comment.idea) {
-          const votecount = calculateVotes(comment.idea.votes || []);
+          let votecount = comment.idea.netVotes || 0;
+          let closed = comment.idea.locked;
+          if (!closed) {
+            const { count } = calculateAllVotes(comment.idea.votes || []);
+            votecount = count;
+            closed = getIsClosed(comment.idea);
+          }
+
           const consensus = calculateConsensus(comment.idea, votecount);
-          const closed = getIsClosed(comment.idea);
+
           return { ...comment, idea: { ...comment.idea, votecount, consensus, closed } };
         }
         return comment;

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Idea" ADD COLUMN     "locked" BOOLEAN DEFAULT false,
+ADD COLUMN     "netDownvotes" INTEGER DEFAULT 0,
+ADD COLUMN     "netUpvotes" INTEGER DEFAULT 0,
+ADD COLUMN     "netVotes" INTEGER DEFAULT 0;
