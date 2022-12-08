@@ -105,13 +105,11 @@ const Comment = ({
   hasNouns,
   level,
   isIdeaClosed,
-  refetch,
 }: {
   comment: CommentType;
   hasNouns: boolean;
   level: number;
   isIdeaClosed: boolean;
-  refetch: () => void;
 }) => {
   const { id } = useParams() as { id: string };
   const history = useHistory();
@@ -193,7 +191,6 @@ const Comment = ({
                   hasNouns={hasNouns}
                   level={level + 1}
                   isIdeaClosed={isIdeaClosed}
-                  refetch={refetch}
                 />
               </div>
             );
@@ -225,19 +222,16 @@ const IdeaPage = () => {
   const [comment, setComment] = useState<string>('');
   const nounBalance = useAccountVotes(account || undefined) ?? 0;
 
-  const [getIdeaQuery, { data, error: _getIdeaError, refetch }] = useLazyQuery<getIdea>(
-    GET_IDEA_QUERY,
-    {
-      context: {
-        clientName: 'PropLot',
-        headers: {
-          ...getAuthHeader(),
-          'proplot-tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
+  const [getIdeaQuery, { data, error: _getIdeaError }] = useLazyQuery<getIdea>(GET_IDEA_QUERY, {
+    context: {
+      clientName: 'PropLot',
+      headers: {
+        ...getAuthHeader(),
+        'proplot-tz': Intl.DateTimeFormat().resolvedOptions().timeZone,
       },
-      client: propLotClient,
     },
-  );
+    client: propLotClient,
+  });
 
   const ens = useReverseENSLookUp(data?.getIdea?.creatorId || '');
   const shortAddress = useShortAddress(data?.getIdea?.creatorId || '');
@@ -366,7 +360,6 @@ const IdeaPage = () => {
                     hasNouns={hasNouns}
                     level={1}
                     isIdeaClosed={!!data.getIdea?.closed}
-                    refetch={refetch}
                   />
                 );
               })}

@@ -5,17 +5,21 @@ import { useShortAddress } from '../../../utils/addressAndENSDisplayUtils';
 import { getPropLotProfile_propLotProfile_list_Comment as Comment } from '../../graphql/__generated__/getPropLotProfile';
 import Card from 'react-bootstrap/Card';
 import moment from 'moment';
+import { useEthers } from '@usedapp/core';
 
 import { useLazyQuery } from '@apollo/client';
 import { BigNumber as EthersBN } from 'ethers';
 import { StandaloneNounCircular } from '../../../components/StandaloneNoun';
 import { NOUNS_BY_OWNER_SUB } from '../../../wrappers/subgraph';
+import { useIdeas } from '../../../hooks/useIdeas';
 
 const ProfileCommentRow = ({ comment }: { comment: Comment }) => {
   const { idea, parent, parentId, createdAt, body } = comment;
   const wallet = parentId && parent ? parent.authorId : idea?.creatorId;
   const ens = useReverseENSLookUp(wallet || '');
   const shortAddress = useShortAddress(wallet || '');
+  const { deleteComment } = useIdeas();
+  const { account } = useEthers();
 
   const [getNounsByOwnerQuerySub, { data: getNounsByOwnerDataSub }] = useLazyQuery(
     NOUNS_BY_OWNER_SUB,
@@ -64,6 +68,18 @@ const ProfileCommentRow = ({ comment }: { comment: Comment }) => {
         </Card.Text>
         <Card.Text className="font-semibold text-[12px] text-[#8C8D92] !mb-[0px] !p-[0px]">
           {moment(createdAt).format('MMM Do YYYY')}
+          {comment.authorId === account && (
+            <span
+              className="text-red-500 cursor-pointer ml-2"
+              onClick={async () => {
+                console.log(idea?.id);
+                console.log(comment.id);
+                await deleteComment(idea?.id || 0, comment.id);
+              }}
+            >
+              Delete
+            </span>
+          )}
         </Card.Text>
       </Card.Body>
     </Card>

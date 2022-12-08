@@ -94,7 +94,9 @@ class IdeasService {
             },
           },
           _count: {
-            select: { comments: true },
+            select: {
+              comments: { where: { deleted: false, parent: { deleted: false } } },
+            },
           },
         },
       });
@@ -147,7 +149,9 @@ class IdeasService {
             },
           },
           _count: {
-            select: { comments: true },
+            select: {
+              comments: { where: { deleted: false, parent: { deleted: false } } },
+            },
           },
         },
       });
@@ -194,7 +198,9 @@ class IdeasService {
             },
           },
           _count: {
-            select: { comments: true },
+            select: {
+              comments: { where: { deleted: false, parent: { deleted: false } } },
+            },
           },
         },
       });

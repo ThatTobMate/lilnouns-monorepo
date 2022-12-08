@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
 }
 
 datasource db {
@@ -61,7 +62,7 @@ model Comment {
   ideaId      Int
   author      User   @relation(fields: [authorId], references: [wallet])
   authorId    String
-  replies    Comment[] @relation("Comment_Children")
+  replies     Comment[] @relation("Comment_Children")
   parent      Comment?  @relation("Comment_Children", fields: [parentId], references: [id], onDelete: Cascade)
   parentId    Int?
   createdAt   DateTime  @default(now())
