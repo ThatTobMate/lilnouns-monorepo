@@ -15,6 +15,10 @@ processes = []
   allowed_public_ports = []
   auto_rollback = true
 
+[processes]
+  app = ""
+  cron = "node dist/tasks/lock-ideas.js"
+
 [[services]]
   http_checks = []
   internal_port = 8080
