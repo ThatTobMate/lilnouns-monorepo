@@ -10,7 +10,7 @@ import { calculateAllVotes } from '../src/graphql/utils/queryUtils';
 cron.schedule('0 0 * * *', async () => {
   try {
     console.log('RUNNING CRON');
-    const sevenDaysAgo = moment().subtract(0, 'days').toISOString();
+    const sevenDaysAgo = moment().subtract(7, 'days').toISOString();
 
     const ideas = await prisma.idea.findMany({
       where: {
