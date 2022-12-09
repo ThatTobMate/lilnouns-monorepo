@@ -70,6 +70,7 @@ export const DATE_FILTERS: { [key: string]: any } = {
 };
 
 export const getIsClosed = (idea: any) => {
+  // If you change the closing timeframe then make sure to update the cron task too in app/tasks/lock-ideas.ts
   return moment(idea.createdAt).isBefore(moment().subtract(7, 'days').toISOString());
 };
 

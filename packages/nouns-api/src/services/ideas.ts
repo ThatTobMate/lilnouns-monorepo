@@ -79,30 +79,21 @@ class IdeasService {
         },
       });
 
-      const ideasToUpdate: any = [];
-
       const ideaData = ideas
         .map((idea: any) => {
-          let votecount = idea.closingVoteCount;
+          let votecount = idea.netVotes;
           let closed = idea.locked;
+          // Locked property gets set by a cron job that runs every hour. Due to this there could be a period of
+          // time where locked is `false` but `closed` is true so we still want to check for closed items.
           if (!closed) {
-            const { count, upvotes, downvotes } = calculateAllVotes(idea.votes);
+            const { count } = calculateAllVotes(idea.votes);
             votecount = count;
             closed = getIsClosed(idea);
-
-            if (closed) {
-              //Trigger async event to update idea
-              ideasToUpdate.push({ ...idea, votecount, closed, upvotes, downvotes });
-            }
           }
 
           return { ...idea, votecount, closed };
         })
         .sort(sortFn[sortBy || 'LATEST']);
-
-      // Run this batch update async, the result of this update shouldn't affect the current
-      // request to fetch the list of ideas.
-      this.batchLockIdeas(ideasToUpdate);
 
       return ideaData;
     } catch (e: any) {
@@ -152,21 +143,16 @@ class IdeasService {
         },
       });
 
-      const ideasToUpdate: any = [];
-
       const ideaData = ideas
         .map((idea: any) => {
-          let votecount = idea.closingVoteCount;
+          let votecount = idea.netVotes;
           let closed = idea.locked;
+          // Locked property gets set by a cron job that runs every hour. Due to this there could be a period of
+          // time where locked is `false` but `closed` is true so we still want to check for closed items.
           if (!closed) {
-            const { count, upvotes, downvotes } = calculateAllVotes(idea.votes);
+            const { count } = calculateAllVotes(idea.votes);
             votecount = count;
             closed = getIsClosed(idea);
-
-            if (closed) {
-              //Trigger async event to update idea
-              ideasToUpdate.push({ ...idea, votecount, closed, upvotes, downvotes });
-            }
           }
 
           const consensus = calculateConsensus(idea, votecount);
@@ -186,10 +172,6 @@ class IdeasService {
           });
         })
         .sort(sortFn[sortBy || 'LATEST']);
-
-      // Run this batch update async, the result of this update shouldn't affect the current
-      // request to fetch the list of ideas.
-      this.batchLockIdeas(ideasToUpdate);
 
       return ideaData;
     } catch (e: any) {
@@ -453,23 +435,7 @@ class IdeasService {
       throw new Error('Idea not found for comment');
     }
 
-    return idea.locked || getIsClosed(idea);
-  }
-
-  // Lock ideas with the latest closingVoteCount to prevent voting history from changing
-  // if users buy/sell lil nouns
-  static async batchLockIdeas(ideas: any) {
-    for await (const idea of ideas) {
-      await prisma.idea.update({
-        where: { id: idea.id },
-        data: {
-          locked: true,
-          netVotes: idea.votecount,
-          netUpvotes: idea.upvotes,
-          netDownvotes: idea.downvotes,
-        },
-      });
-    }
+    return Boolean(idea.locked) || getIsClosed(idea);
   }
 
   static async deleteIdea(id: number) {
