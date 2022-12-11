@@ -95,7 +95,7 @@ class IdeasService {
           },
           _count: {
             select: {
-              comments: { where: { deleted: false, parent: { deleted: false } } },
+              comments: { where: { deleted: false } },
             },
           },
         },
@@ -150,7 +150,7 @@ class IdeasService {
           },
           _count: {
             select: {
-              comments: { where: { deleted: false, parent: { deleted: false } } },
+              comments: { where: { deleted: false } },
             },
           },
         },
@@ -199,7 +199,7 @@ class IdeasService {
           },
           _count: {
             select: {
-              comments: { where: { deleted: false, parent: { deleted: false } } },
+              comments: { where: { deleted: false } },
             },
           },
         },
@@ -344,23 +344,33 @@ class IdeasService {
         where: {
           ideaId: id,
           parentId: null,
-          deleted: false,
         },
         include: {
           replies: {
-            where: { deleted: false },
             include: {
               replies: {
-                where: { deleted: false },
                 include: {
-                  replies: {
-                    where: { deleted: false },
-                  },
+                  replies: true,
                 },
               },
             },
           },
         },
+        // include: {
+        //   replies: {
+        //     where: { deleted: false },
+        //     include: {
+        //       replies: {
+        //         where: { deleted: false },
+        //         include: {
+        //           replies: {
+        //             where: { deleted: false },
+        //           },
+        //         },
+        //       },
+        //     },
+        //   },
+        // },
       });
 
       return comment;
