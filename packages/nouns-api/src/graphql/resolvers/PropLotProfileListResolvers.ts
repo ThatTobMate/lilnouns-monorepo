@@ -106,6 +106,8 @@ const resolvers: IResolvers = {
           wallet: root.wallet,
         });
 
+        console.log(comments);
+
         listItems = [...comments];
       }
 
