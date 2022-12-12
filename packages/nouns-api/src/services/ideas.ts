@@ -134,7 +134,6 @@ class IdeasService {
       const profileFilters: any = PROFILE_TAB_FILTERS[tab || 'DEFAULT'](wallet);
       const ideas = await prisma.idea.findMany({
         where: {
-          deleted: false,
           createdAt: {
             gte: dateRange.gte,
             lte: dateRange.lte,

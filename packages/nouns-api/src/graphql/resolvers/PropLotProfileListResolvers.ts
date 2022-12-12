@@ -97,6 +97,7 @@ const resolvers: IResolvers = {
           wallet: root.wallet,
           tab,
         });
+
         listItems = [...ideas];
       }
 
@@ -105,8 +106,6 @@ const resolvers: IResolvers = {
           sortBy: parseFilterParam(root.sortParam)?.value,
           wallet: root.wallet,
         });
-
-        console.log(comments);
 
         listItems = [...comments];
       }
