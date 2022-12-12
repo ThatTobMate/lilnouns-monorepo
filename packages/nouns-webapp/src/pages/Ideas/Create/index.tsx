@@ -78,6 +78,10 @@ const CreateIdeaPage = () => {
       label: 'Other',
       value: 'OTHER',
     },
+    {
+      label: 'Nouns DAO Prop',
+      value: 'NOUNS',
+    },
   ];
 
   return (
@@ -140,7 +144,7 @@ const CreateIdeaPage = () => {
       <Col lg={10} className={classes.wrapper}>
         <Row className={classes.headerRow}>
           <div>
-            <span className="cursor-pointer inline-block" onClick={() => history.push('/ideas')}>
+            <span className="cursor-pointer inline-block" onClick={() => history.push('/proplot')}>
               Back
             </span>
           </div>

@@ -17,11 +17,13 @@ const IdeaVoteControls = ({
   nounBalance,
   withAvatars = false,
   refetchPropLotOnVote = false,
+  disableControls = false,
 }: {
   idea: Idea;
   nounBalance: number;
   withAvatars?: boolean;
   refetchPropLotOnVote?: boolean;
+  disableControls?: boolean;
 }) => {
   const { id, votecount: voteCount, closed, votes } = idea;
   const { account, library: provider } = useEthers();
@@ -120,45 +122,49 @@ const IdeaVoteControls = ({
         {calculatedVoteCount}
       </span>
       <div className="flex flex-[row] sm:flex-col items-center sm:items-end justify-center sm:justify-between space-x-3 sm:space-x-0 sm:space-y-1 sm:h-[65px]">
-        <svg
-          onClick={e => {
-            e.stopPropagation();
-            if (hasVotes && !userHasUpVote && !loading && !closed) {
-              vote(1);
-            }
-          }}
-          width="20"
-          height="12"
-          viewBox="0 0 20 12"
-          fill={hasVotes && userHasUpVote ? 'rgb(59 130 246)' : '#8c8d92'}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M18.6523 11.6711H1.34765C0.149416 11.6711 -0.450643 10.2224 0.396621 9.37512L9.04896 0.722781C9.57417 0.19757 10.4258 0.19757 10.951 0.722781L19.6033 9.37512C20.4507 10.2224 19.8506 11.6711 18.6523 11.6711Z"
-            fill={hasVotes && userHasUpVote ? 'text-blue-500' : 'text-[#8c8d92]'}
-          />
-        </svg>
+        {!closed && !disableControls && (
+          <svg
+            onClick={e => {
+              e.stopPropagation();
+              if (hasVotes && !userHasUpVote && !loading && !closed) {
+                vote(1);
+              }
+            }}
+            width="20"
+            height="12"
+            viewBox="0 0 20 12"
+            fill={hasVotes && userHasUpVote ? 'rgb(59 130 246)' : '#8c8d92'}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18.6523 11.6711H1.34765C0.149416 11.6711 -0.450643 10.2224 0.396621 9.37512L9.04896 0.722781C9.57417 0.19757 10.4258 0.19757 10.951 0.722781L19.6033 9.37512C20.4507 10.2224 19.8506 11.6711 18.6523 11.6711Z"
+              fill={hasVotes && userHasUpVote ? 'text-blue-500' : 'text-[#8c8d92]'}
+            />
+          </svg>
+        )}
         <span className="font-bold text-lg sm:text-2xl mr-4 sm:min-w-[75px] text-right block sm:hidden">
           {calculatedVoteCount}
         </span>
-        <svg
-          width="20"
-          height="12"
-          viewBox="0 0 20 12"
-          fill={hasVotes && userHasDownVote ? 'rgb(239 68 68)' : '#8c8d92'}
-          xmlns="http://www.w3.org/2000/svg"
-          onClick={e => {
-            e.stopPropagation();
-            if (hasVotes && !userHasDownVote && !loading && !closed) {
-              vote(-1);
-            }
-          }}
-        >
-          <path
-            d="M1.34572 0.327469H18.6543C19.8517 0.327469 20.4504 1.77377 19.6028 2.62137L10.9519 11.279C10.4272 11.8037 9.57283 11.8037 9.04813 11.279L0.397216 2.62137C-0.450385 1.77377 0.148317 0.327469 1.34572 0.327469Z"
+        {!closed && !disableControls && (
+          <svg
+            width="20"
+            height="12"
+            viewBox="0 0 20 12"
             fill={hasVotes && userHasDownVote ? 'rgb(239 68 68)' : '#8c8d92'}
-          />
-        </svg>
+            xmlns="http://www.w3.org/2000/svg"
+            onClick={e => {
+              e.stopPropagation();
+              if (hasVotes && !userHasDownVote && !loading && !closed) {
+                vote(-1);
+              }
+            }}
+          >
+            <path
+              d="M1.34572 0.327469H18.6543C19.8517 0.327469 20.4504 1.77377 19.6028 2.62137L10.9519 11.279C10.4272 11.8037 9.57283 11.8037 9.04813 11.279L0.397216 2.62137C-0.450385 1.77377 0.148317 0.327469 1.34572 0.327469Z"
+              fill={hasVotes && userHasDownVote ? 'rgb(239 68 68)' : '#8c8d92'}
+            />
+          </svg>
+        )}
       </div>
     </>
   );

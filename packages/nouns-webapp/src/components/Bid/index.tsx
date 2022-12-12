@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef, ChangeEvent, useCallback } from 're
 import { utils, BigNumber as EthersBN } from 'ethers';
 import BigNumber from 'bignumber.js';
 import classes from './Bid.module.css';
-import { Spinner, InputGroup, FormControl, Button, Col } from 'react-bootstrap';
+import { Spinner, InputGroup, FormControl, Button, Col, Nav } from 'react-bootstrap';
 import { useAuctionMinBidIncPercentage } from '../../wrappers/nounsAuction';
 import { useAppDispatch } from '../../hooks';
 import { AlertModal, setAlertModal } from '../../state/slices/application';
@@ -16,6 +16,7 @@ import SettleManuallyBtn from '../SettleManuallyBtn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import InfoModal from '../InfoModal';
+import AuctionSettlementBtnGroup from '../AuctionSettlementBtnGroup';
 
 const computeMinimumNextBid = (
   currentBid: BigNumber,
@@ -348,7 +349,11 @@ const Bid: React.FC<{
             {/* Only show force settle button if wallet connected */}
             {isWalletConnected ? (
               <Col lg={12}>
-                <SettleManuallyBtn settleAuctionHandler={settleAuctionHandler} auction={auction} />
+                <AuctionSettlementBtnGroup
+                  settleAuctionHandler={settleAuctionHandler}
+                  auction={auction}
+                />
+
                 <button onClick={showBidModalHandler} className={classes.infoButton}>
                   <FontAwesomeIcon icon={faInfoCircle} />
                   {` bidding and settling`}
@@ -357,11 +362,11 @@ const Bid: React.FC<{
             ) : (
               <>
                 <Col lg={12}>
-                <button onClick={showBidModalHandler} className={classes.infoButton}>
-                  <FontAwesomeIcon icon={faInfoCircle} />
-                  {` bidding and settling`}
-                </button>
-              </Col>
+                  <button onClick={showBidModalHandler} className={classes.infoButton}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    {` bidding and settling`}
+                  </button>
+                </Col>
               </>
             )}
           </>
