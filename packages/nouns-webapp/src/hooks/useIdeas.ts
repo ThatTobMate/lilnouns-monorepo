@@ -325,10 +325,24 @@ export const useIdeas = () => {
     }
   };
 
+  const deleteCommentWithoutReValidation = async (ideaId: number, commentId: number) => {
+    const response = await fetch(`${HOST}/comment/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    if (!response.ok) throw new Error('Failed to delete comment');
+
+    const data = await response.json();
+    return data;
+  };
+
   const deleteComment = (ideaId: number, commentId: number) => {
+    const key = `${HOST}/idea/${ideaId}/comments`;
     try {
       mutate(
-        `${HOST}/idea/${ideaId}/comments`,
+        key,
         async () => {
           const response = await fetch(`${HOST}/comment/${commentId}`, {
             method: 'DELETE',
@@ -337,7 +351,9 @@ export const useIdeas = () => {
             },
           });
           if (!response.ok) throw new Error('Failed to delete comment');
-          return response.json();
+
+          const data = await response.json();
+          return data;
         },
         {
           optimisticData: ({ data }: { data: Comment[] }) => {
@@ -352,8 +368,6 @@ export const useIdeas = () => {
           },
           rollbackOnError: true,
           populateCache: ({ data }: { data: Comment }, currentData: { data: Comment[] }) => {
-            console.log(data);
-            console.log(currentData);
             return { data: currentData.data };
           },
           revalidate: true,
@@ -435,6 +449,16 @@ export const useIdeas = () => {
         } catch (e) {}
       } else {
         commentOnIdea(formData);
+      }
+    },
+    deleteCommentWithoutReValidation: async (ideaId: number, commentId: number) => {
+      if (!isLoggedIn()) {
+        try {
+          await triggerSignIn();
+          await deleteCommentWithoutReValidation(ideaId, commentId);
+        } catch (e) {}
+      } else {
+        await deleteCommentWithoutReValidation(ideaId, commentId);
       }
     },
     deleteComment: async (ideaId: number, commentId: number) => {

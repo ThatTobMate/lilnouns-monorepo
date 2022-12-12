@@ -18,7 +18,7 @@ const ProfileCommentRow = ({ comment, refetch }: { comment: Comment; refetch: ()
   const wallet = parentId && parent ? parent.authorId : idea?.creatorId;
   const ens = useReverseENSLookUp(wallet || '');
   const shortAddress = useShortAddress(wallet || '');
-  const { deleteComment } = useIdeas();
+  const { deleteCommentWithoutReValidation } = useIdeas();
   const { account } = useEthers();
 
   const [getNounsByOwnerQuerySub, { data: getNounsByOwnerDataSub }] = useLazyQuery(
@@ -75,7 +75,7 @@ const ProfileCommentRow = ({ comment, refetch }: { comment: Comment; refetch: ()
               <span
                 className="text-red-500 cursor-pointer ml-2"
                 onClick={async () => {
-                  await deleteComment(idea?.id || 0, comment.id);
+                  await deleteCommentWithoutReValidation(Number(idea?.id) || 0, comment.id);
                   await refetch();
                 }}
               >

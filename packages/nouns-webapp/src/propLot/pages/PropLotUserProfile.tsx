@@ -384,7 +384,11 @@ const PropLotUserProfile = () => {
                       <ProfileCommentRow
                         key={`comment-${listItem.id}`}
                         comment={listItem}
-                        refetch={refetch}
+                        refetch={() =>
+                          refetch({
+                            options: { wallet: id, requestUUID: v4(), filters: appliedFilters },
+                          })
+                        }
                       />
                     </div>
                   );

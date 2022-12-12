@@ -339,7 +339,8 @@ const IdeaPage = () => {
 
         <div className="mt-2 mb-2">
           <h3 className="text-2xl lodrina font-bold">
-            {comments?.length} {comments?.length === 1 ? 'comment' : 'comments'}
+            {comments.filter(c => !!c.deleted)?.length}{' '}
+            {comments.filter(c => !!c.deleted)?.length === 1 ? 'comment' : 'comments'}
           </h3>
         </div>
 
