@@ -352,6 +352,8 @@ export const useIdeas = () => {
           },
           rollbackOnError: true,
           populateCache: ({ data }: { data: Comment }, currentData: { data: Comment[] }) => {
+            console.log(data);
+            console.log(currentData);
             return { data: currentData.data };
           },
           revalidate: true,
@@ -366,29 +368,19 @@ export const useIdeas = () => {
     }
   };
 
-  const deleteIdea = (id: number) => {
+  // no mutate here, because we are getting the list of ideas from the graphql query and not the API.
+  // there is no cache key to update. (unlike comments)
+  const deleteIdea = async (id: number) => {
     try {
-      mutate(
-        `${HOST}/ideas`,
-        async () => {
-          const response = await fetch(`${HOST}/idea/${id}`, {
-            method: 'DELETE',
-            headers: {
-              ...getAuthHeader(),
-            },
-          });
-          if (!response.ok) throw new Error('Failed to delete idea');
-          const idea = await response.json();
-          return idea.data;
+      const response = await fetch(`${HOST}/idea/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...getAuthHeader(),
         },
-        {
-          rollbackOnError: true,
-          populateCache: ({ data }: { data: Idea }, currentData: { data: Idea[] }) => {
-            return { data: currentData.data };
-          },
-          revalidate: true,
-        },
-      );
+      });
+      if (!response.ok) throw new Error('Failed to delete idea');
+      const idea = await response.json();
+      return idea.data;
     } catch (e: any) {
       console.error(e);
       const error = {

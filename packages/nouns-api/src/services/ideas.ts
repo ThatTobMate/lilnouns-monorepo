@@ -122,21 +122,21 @@ class IdeasService {
     date,
     wallet,
     tab,
-    includeDeleted = false,
+    hideDeleted = true,
   }: {
     sortBy?: string;
     tags?: TagType[];
     date?: string;
     wallet?: string;
     tab?: string;
-    includeDeleted?: boolean;
+    hideDeleted?: boolean;
   }) {
     try {
       const dateRange: any = DATE_FILTERS[date || 'ALL_TIME'].filterFn();
       const profileFilters: any = PROFILE_TAB_FILTERS[tab || 'DEFAULT'](wallet);
       const ideas = await prisma.idea.findMany({
         where: {
-          deleted: includeDeleted,
+          ...(hideDeleted && { deleted: false }),
           createdAt: {
             gte: dateRange.gte,
             lte: dateRange.lte,

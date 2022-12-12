@@ -59,7 +59,7 @@ const ProfileLilNounDisplay = ({
   const { id } = useParams() as { id: string };
   const { library: provider } = useEthers();
 
-  const [getNounsByOwnerQuerySub, { data: getNounsByOwnerDataSub }] = useLazyQuery(
+  const [getNounsByOwnerQuerySub, { data: getNounsByOwnerDataSub, refetch }] = useLazyQuery(
     NOUNS_BY_OWNER_SUB,
     {
       context: {
@@ -381,7 +381,11 @@ const PropLotUserProfile = () => {
                 if (listItem.__typename === 'Comment') {
                   return (
                     <div className="mb-[16px] space-y-4">
-                      <ProfileCommentRow key={`comment-${listItem.id}`} comment={listItem} />
+                      <ProfileCommentRow
+                        key={`comment-${listItem.id}`}
+                        comment={listItem}
+                        refetch={refetch}
+                      />
                     </div>
                   );
                 }

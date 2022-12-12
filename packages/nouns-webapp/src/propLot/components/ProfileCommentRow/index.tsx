@@ -13,7 +13,7 @@ import { StandaloneNounCircular } from '../../../components/StandaloneNoun';
 import { NOUNS_BY_OWNER_SUB } from '../../../wrappers/subgraph';
 import { useIdeas } from '../../../hooks/useIdeas';
 
-const ProfileCommentRow = ({ comment }: { comment: Comment }) => {
+const ProfileCommentRow = ({ comment, refetch }: { comment: Comment; refetch: () => void }) => {
   const { idea, parent, parentId, createdAt, body, deleted } = comment;
   const wallet = parentId && parent ? parent.authorId : idea?.creatorId;
   const ens = useReverseENSLookUp(wallet || '');
@@ -75,9 +75,8 @@ const ProfileCommentRow = ({ comment }: { comment: Comment }) => {
               <span
                 className="text-red-500 cursor-pointer ml-2"
                 onClick={async () => {
-                  console.log(idea?.id);
-                  console.log(comment.id);
                   await deleteComment(idea?.id || 0, comment.id);
+                  await refetch();
                 }}
               >
                 Delete

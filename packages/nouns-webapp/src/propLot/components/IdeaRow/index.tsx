@@ -167,9 +167,7 @@ const IdeaRow = ({
                         // stop propagation to prevent the card from closing
                         event.stopPropagation();
                         await deleteIdea(idea.id);
-                        setTimeout(() => {
-                          refetch();
-                        }, 500);
+                        refetch();
                       }}
                       className="text-red-500 self-end font-bold ml-2"
                     >
