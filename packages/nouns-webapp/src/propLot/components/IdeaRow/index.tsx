@@ -137,15 +137,18 @@ const IdeaRow = ({
             />
           </div>
           <div className="font-propLot font-semibold text-[14px] flex-col sm:flex-row flex flex-1 justify-content-start align-items-start pt-[24px] sm:pt-[16px]">
-            <span className="flex flex-1 text-[#8c8d92] whitespace-pre">
-              <span className="text-[#2B83F6] underline cursor-pointer"
-                  onClick={() => {
-                    history.push(`/proplot/profile/${idea.creatorId}`);
-                  }}>
-                {`${ens || shortAddress} | ${
-                  creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-                } | ${moment(createdAt).format('MMM Do YYYY')}`}
+            <span className="flex flex-1 text-[#8c8d92] whitespace-pre self-end">
+              <span
+                className="text-[#2B83F6] underline cursor-pointer"
+                onClick={() => {
+                  history.push(`/proplot/profile/${idea.creatorId}`);
+                }}
+              >
+                {ens || shortAddress}
               </span>
+              {` | ${
+                creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
+              } | ${moment(createdAt).format('MMM Do YYYY')}`}
             </span>
             <span className="mt-[16px] sm:mt-[0px] w-full sm:w-auto justify-self-end text-[#2b83f6] flex justify-end">
               <Button
