@@ -40,6 +40,25 @@ class IdeasController {
     }
   };
 
+  static createProposal = async (req: Request, res: Response, next: any) => {
+    try {
+      const proposal = await IdeasService.createProposal(req.body, req.user);
+
+      res.status(200).json({
+        status: true,
+        message: 'Proposal created',
+        data: proposal,
+      });
+    } catch (e: any) {
+      res
+        .status(e.statusCode || 500)
+        .json({
+          message: e.message,
+        })
+        .end();
+    }
+  };
+
   static createIdea = async (req: Request, res: Response, next: any) => {
     try {
       const idea = await IdeasService.createIdea(req.body, req.user);

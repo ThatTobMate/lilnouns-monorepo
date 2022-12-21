@@ -1,5 +1,7 @@
+// @ts-nocheck
+// TODO -- remove once the graphql types are working again on the front-end
 import React, { useState, useEffect } from 'react';
-import { Button, Col, FormControl, Row } from 'react-bootstrap';
+import { Alert, Button, Col, FormControl, Row } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 import { useEthers } from '@usedapp/core';
 import Section from '../../../layout/Section';
@@ -20,8 +22,8 @@ import { useLazyQuery } from '@apollo/client';
 import propLotClient from '../../../propLot/graphql/config';
 import { GET_IDEA_QUERY } from '../../../propLot/graphql/ideaQuery';
 import { virtualTagColorMap } from '../../../utils/virtualTagColors';
-
 import IdeaVoteControls from '../../../propLot/components/IdeaVoteControls';
+import IdeaRow from '../../../propLot/components/IdeaRow';
 
 const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
@@ -239,6 +241,8 @@ const IdeaPage = () => {
     client: propLotClient,
   });
 
+  console.log(data);
+
   const ens = useReverseENSLookUp(data?.getIdea?.creatorId || '');
   const shortAddress = useShortAddress(data?.getIdea?.creatorId || '');
 
@@ -263,6 +267,8 @@ const IdeaPage = () => {
   const creatorLilNoun = data.getIdea.votes?.find(vote =>
     data.getIdea ? vote.voterId === data.getIdea.creatorId : false,
   )?.voter?.lilnounCount;
+
+  const isNounOwner = account !== undefined && hasNouns;
 
   return (
     <Section fullWidth={false}>
@@ -304,6 +310,21 @@ const IdeaPage = () => {
             )}
           </div>
         </Row>
+        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mb-12 whitespace-pre">
+          <span
+            className="text-[#2B83F6] underline cursor-pointer"
+            onClick={() => {
+              data.getIdea?.creatorId && history.push(`/proplot/profile/${data.getIdea.creatorId}`);
+            }}
+          >
+            {ens || shortAddress}
+          </span>
+          {` | ${
+            creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
+          } | ${moment(data.getIdea.createdAt).format('MMM Do YYYY')} ${
+            data.getIdea.closed ? '| closed' : ''
+          }`}
+        </div>
         <div className="space-y-8">
           <div className="flex flex-col">
             <h3 className="lodrina font-bold text-2xl mb-2">tl:dr</h3>
@@ -321,21 +342,27 @@ const IdeaPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12 whitespace-pre">
-          <span
-            className="text-[#2B83F6] underline cursor-pointer"
-            onClick={() => {
-              data.getIdea?.creatorId && history.push(`/proplot/profile/${data.getIdea.creatorId}`);
-            }}
-          >
-            {ens || shortAddress}
-          </span>
-          {` | ${
-            creatorLilNoun === 1 ? `${creatorLilNoun} lil noun` : `${creatorLilNoun} lil nouns`
-          } | ${moment(data.getIdea.createdAt).format('MMM Do YYYY')} ${
-            data.getIdea.closed ? '| closed' : ''
-          }`}
-        </div>
+        <section>
+          <div className="flex flex-row justify-between mt-4 mb-4">
+            <h3 className="text-2xl lodrina font-bold">Proposals</h3>
+            <Button
+              disabled={!isNounOwner}
+              className="!bg-[#2B83F6] !text-white !text-[16px] flex-1 sm:flex-none !rounded-[10px] !font-propLot !font-bold !pt-[8px] !pb-[8px] !pl-[16px] !pr-[16px]"
+              onClick={() => history.push(`/proplot/${id}/propose`)}
+            >
+              New Proposal
+            </Button>
+          </div>
+          {data.getIdea.proposals.length === 0 && (
+            <Alert variant="secondary">
+              <Alert.Heading>No proposals found.</Alert.Heading>
+              <p>Proposals submitted by community members will appear here.</p>
+            </Alert>
+          )}
+          {data.getIdea.proposals.map(proposal => {
+            return <IdeaRow idea={proposal} disableControls={true} />;
+          })}
+        </section>
 
         <div className="mt-2 mb-2">
           <h3 className="text-2xl lodrina font-bold">

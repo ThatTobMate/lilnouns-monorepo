@@ -193,6 +193,7 @@ class IdeasService {
           id,
         },
         include: {
+          proposals: true,
           tags: true,
           votes: {
             include: {
@@ -223,6 +224,52 @@ class IdeasService {
 
       return ideaData;
     } catch (e: any) {
+      throw e;
+    }
+  }
+
+  static async createProposal(
+    data: { ideaId: string; title: string; tldr: string; description: string; tags: TagType[] },
+    user?: { wallet: string },
+  ) {
+    try {
+      if (!user) {
+        throw new Error('Failed to save proposal: missing user details');
+      }
+
+      const totalSupply = await nounsTotalSupply();
+
+      if (!totalSupply) {
+        throw new Error("Failed to save proposal: couldn't fetch token supply");
+      }
+
+      const proposal = await prisma.idea.create({
+        data: {
+          title: data.title,
+          tldr: data.tldr,
+          description: data.description,
+          creatorId: user.wallet,
+          votecount: 0,
+          tokenSupplyOnCreate: totalSupply,
+          parentId: parseInt(data.ideaId),
+          votes: {
+            create: {
+              direction: 1,
+              voterId: user.wallet,
+            },
+          },
+          tags: {
+            connect: data.tags.map(tag => {
+              return {
+                type: tag,
+              };
+            }),
+          },
+        },
+      });
+
+      return { ...proposal, closed: false };
+    } catch (e) {
       throw e;
     }
   }

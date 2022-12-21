@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useEthers } from '@usedapp/core';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { setActiveAccount } from './state/slices/account';
@@ -34,6 +34,7 @@ import dayjs from 'dayjs';
 import { AvatarProvider } from '@davatar/react';
 import IdeasPage from './pages/Ideas';
 import IdeaPage from './pages/Ideas/:id';
+import ProposePage from './propLot/pages/Propose';
 import PropLotUserProfilePage from './propLot/pages/PropLotUserProfile';
 import CreateIdeaPage from './pages/Ideas/Create';
 import DelegatePage from './pages/DelegatePage';
@@ -139,6 +140,7 @@ function App() {
               <Route exact path={['/ideas', '/proplot']} component={IdeasPage} />
               <Route exact path={['/ideas/create', '/proplot/create']} component={CreateIdeaPage} />
               <Route exact path={['/ideas/:id', '/proplot/:id']} component={IdeaPage} />
+              <Route exact path={['/proplot/:id/propose']} component={ProposePage} />
               <Route exact path="/proplot/profile/:id" component={PropLotUserProfilePage} />
               <Route exact path="/vote/:id" component={VotePage} />
               <Route exact path="/vote/nounsdao/:id" component={NounsVotePage} />

@@ -20,6 +20,19 @@ export const GET_IDEA_QUERY = gql`
         type
         label
       }
+      proposals {
+        id
+        title
+        tldr
+        creatorId
+        description
+        votecount
+        createdAt
+        deleted
+        ideaStats {
+          comments
+        }
+      }
       votes {
         id
         voterId
