@@ -15,6 +15,7 @@ import { useLazyQuery } from '@apollo/client';
 import { useAuth } from '../../hooks/useAuth';
 import { getIdea } from '../graphql/__generated__/getIdea';
 import { GET_IDEA_QUERY } from '../graphql/ideaQuery';
+import IdeaRow from '../components/IdeaRow';
 
 enum FORM_VALIDATION {
   TITLE_MAX = 50,
@@ -45,8 +46,6 @@ const ProposePage = () => {
   useEffect(() => {
     getIdeaQuery({ variables: { ideaId: parseInt(id) } });
   }, []);
-
-  console.log(data);
 
   const [title, setTitle] = useState<string>('');
   const [tldr, setTldr] = useState<string>('');
@@ -176,14 +175,22 @@ const ProposePage = () => {
         </Row>
         <p className={classes.subheading}>
           You must hold at least one lil noun in order to propose an idea and vote on others.
-          Proposing an idea means you are responding with an idea to another idea that exists on
-          PropLot.
+          Proposals are ideas submitted in response to another idea that exists on PropLot. The idea
+          you are proposing to is below.
         </p>
-        <p className={''}>You are proposing to idea {data?.getIdea?.id}.</p>
-        <p className={''}>{data?.getIdea?.title}</p>
-        <p className={''}>{data?.getIdea?.tldr}</p>
+        {data?.getIdea && (
+          <IdeaRow
+            idea={data?.getIdea}
+            disableControls={true}
+            nounBalance={0}
+            refetch={() => {
+              console.log('refetching soon...');
+            }}
+          />
+        )}
         <form
           id="submit-form"
+          className="space-y-12 mt-12"
           onSubmit={event => {
             event.preventDefault();
             const target = event.target as HTMLFormElement; // quiets TS
@@ -203,30 +210,34 @@ const ProposePage = () => {
             });
           }}
         >
-          <p className="lodrina font-bold text-2xl mb-2">Tags</p>
-          <span className="text-xs">Apply the tags that relate to your idea. Click to apply.</span>
-          <div className="flex flex-row flex-wrap gap-[16px] my-[16px]">
-            {tags.map(tag => (
-              <div className="flex flex-col items-center">
-                <label
-                  htmlFor={tag.label}
-                  className={`cursor-pointer text-blue-500 bg-blue-200 text-xs font-bold rounded-[8px] px-[8px] py-[4px] flex`}
-                >
-                  {tag.label}
-                </label>
-                <input
-                  type="checkbox"
-                  onChange={() => handleTagChange(tag.label)}
-                  name="tags"
-                  id={tag.label}
-                  value={tag.value}
-                  hidden
-                />
-                {selectedTags.includes(tag.label) && (
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-[#49A758] mt-[8px]" />
-                )}
-              </div>
-            ))}
+          <div>
+            <p className="lodrina font-bold text-2xl mb-2">Tags</p>
+            <span className="text-xs">
+              Apply the tags that relate to your idea. Click to apply.
+            </span>
+            <div className="flex flex-row flex-wrap gap-[16px] my-[16px]">
+              {tags.map(tag => (
+                <div className="flex flex-col items-center">
+                  <label
+                    htmlFor={tag.label}
+                    className={`cursor-pointer text-blue-500 bg-blue-200 text-xs font-bold rounded-[8px] px-[8px] py-[4px] flex`}
+                  >
+                    {tag.label}
+                  </label>
+                  <input
+                    type="checkbox"
+                    onChange={() => handleTagChange(tag.label)}
+                    name="tags"
+                    id={tag.label}
+                    value={tag.value}
+                    hidden
+                  />
+                  {selectedTags.includes(tag.label) && (
+                    <FontAwesomeIcon icon={faCheckCircle} className="text-[#49A758] mt-[8px]" />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
           <div className="flex flex-col my-[16px]">
             <div className="flex justify-between w-full items-center">

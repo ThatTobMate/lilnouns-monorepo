@@ -359,7 +359,16 @@ const IdeaPage = () => {
               </Alert>
             )}
             {data.getIdea.proposals.map(proposal => {
-              return <IdeaRow idea={proposal} disableControls={true} />;
+              return (
+                <IdeaRow
+                  idea={proposal}
+                  disableControls={true}
+                  nounBalance={0}
+                  refetch={() => {
+                    console.log('refetching soon...');
+                  }}
+                />
+              );
             })}
           </section>
         </div>
