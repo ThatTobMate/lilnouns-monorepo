@@ -286,7 +286,7 @@ const IdeaPage = () => {
               <span className="text-lg lodrina">Back</span>
             </span>
           </div>
-          <div className="flex flex-col mb-12">
+          <div className="flex flex-col mb-2">
             <div className="flex flex-row justify-between items-center">
               <h1 className="mb-0 lodrina">{data.getIdea.title}</h1>
               <div className="flex flex-row justify-end">
@@ -294,7 +294,7 @@ const IdeaPage = () => {
               </div>
             </div>
             {data.getIdea.tags && data.getIdea.tags.length > 0 && (
-              <div className="flex flex-row gap-[8px] mt-4 flex-wrap">
+              <div className="flex flex-row gap-[8px] mt-1 flex-wrap">
                 {data.getIdea.tags.map(tag => {
                   return (
                     <span
@@ -325,13 +325,13 @@ const IdeaPage = () => {
             data.getIdea.closed ? '| closed' : ''
           }`}
         </div>
-        <div className="space-y-8">
+        <div className="space-y-12">
           <div className="flex flex-col">
-            <h3 className="lodrina font-bold text-2xl mb-2">tl:dr</h3>
-            <p>{data.getIdea.tldr}</p>
+            <h3 className="lodrina font-bold text-3xl">tl:dr</h3>
+            <span>{data.getIdea.tldr}</span>
           </div>
           <div className="flex flex-col">
-            <h3 className="lodrina font-bold text-2xl mb-2">Description</h3>
+            <h3 className="lodrina font-bold text-3xl mb-2">Description</h3>
             <div
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(marked.parse(data.getIdea.description), {
@@ -340,32 +340,31 @@ const IdeaPage = () => {
               }}
             />
           </div>
+          <section>
+            <div className="flex flex-row justify-between mb-4">
+              <h3 className="text-3xl lodrina font-bold">Proposals</h3>
+              <Button
+                disabled={!isNounOwner}
+                className="!bg-[#2B83F6] !text-white !text-[16px] flex-1 sm:flex-none !rounded-[10px] !font-propLot !font-bold !pt-[8px] !pb-[8px] !pl-[16px] !pr-[16px]"
+                onClick={() => history.push(`/proplot/${id}/propose`)}
+              >
+                New Proposal
+              </Button>
+            </div>
+            {data.getIdea.proposals.length === 0 && (
+              <Alert variant="secondary">
+                <Alert.Heading>No proposals found.</Alert.Heading>
+                <p>Proposals submitted by community members will appear here.</p>
+              </Alert>
+            )}
+            {data.getIdea.proposals.map(proposal => {
+              return <IdeaRow idea={proposal} disableControls={true} />;
+            })}
+          </section>
         </div>
 
-        <section>
-          <div className="flex flex-row justify-between mt-4 mb-4">
-            <h3 className="text-2xl lodrina font-bold">Proposals</h3>
-            <Button
-              disabled={!isNounOwner}
-              className="!bg-[#2B83F6] !text-white !text-[16px] flex-1 sm:flex-none !rounded-[10px] !font-propLot !font-bold !pt-[8px] !pb-[8px] !pl-[16px] !pr-[16px]"
-              onClick={() => history.push(`/proplot/${id}/propose`)}
-            >
-              New Proposal
-            </Button>
-          </div>
-          {data.getIdea.proposals.length === 0 && (
-            <Alert variant="secondary">
-              <Alert.Heading>No proposals found.</Alert.Heading>
-              <p>Proposals submitted by community members will appear here.</p>
-            </Alert>
-          )}
-          {data.getIdea.proposals.map(proposal => {
-            return <IdeaRow idea={proposal} disableControls={true} />;
-          })}
-        </section>
-
-        <div className="mt-2 mb-2">
-          <h3 className="text-2xl lodrina font-bold">
+        <div className="mt-12 mb-2">
+          <h3 className="text-3xl lodrina font-bold">
             {comments.filter(c => !!c.deleted)?.length}{' '}
             {comments.filter(c => !!c.deleted)?.length === 1 ? 'comment' : 'comments'}
           </h3>
