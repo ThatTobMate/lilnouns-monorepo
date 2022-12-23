@@ -34,9 +34,9 @@ import dayjs from 'dayjs';
 import { AvatarProvider } from '@davatar/react';
 import IdeasPage from './pages/Ideas';
 import IdeaPage from './pages/Ideas/:id';
-import ProposePage from './propLot/pages/Propose';
+import ProposePage from './propLot/pages/PropLotProposeIdea';
 import PropLotUserProfilePage from './propLot/pages/PropLotUserProfile';
-import CreateIdeaPage from './pages/Ideas/Create';
+import CreateIdeaPage from './propLot/pages/PropLotCreateIdea';
 import DelegatePage from './pages/DelegatePage';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
