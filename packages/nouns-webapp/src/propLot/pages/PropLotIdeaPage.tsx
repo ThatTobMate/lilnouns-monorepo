@@ -4,26 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Button, Col, FormControl, Row } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 import { useEthers } from '@usedapp/core';
-import Section from '../../../layout/Section';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
-import { useReverseENSLookUp } from '../../../utils/ensLookup';
-import { useShortAddress } from '../../../utils/addressAndENSDisplayUtils';
-import { useIdeas, CommentFormData, Comment as CommentType } from '../../../hooks/useIdeas';
-import { useAuth } from '../../../hooks/useAuth';
-import { useAccountVotes } from '../../../wrappers/nounToken';
 import moment from 'moment';
 import Davatar from '@davatar/react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { createBreakpoint } from 'react-use';
-import { getIdea } from '../../../propLot/graphql/__generated__/getIdea';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import Section from '../../layout/Section';
+import { useReverseENSLookUp } from '../../utils/ensLookup';
+import { useShortAddress } from '../../utils/addressAndENSDisplayUtils';
+import { useIdeas, CommentFormData, Comment as CommentType } from '../../hooks/useIdeas';
+import { useAuth } from '../../hooks/useAuth';
+import { useAccountVotes } from '../../wrappers/nounToken';
+import { getIdea } from '../graphql/__generated__/getIdea';
 import { useLazyQuery } from '@apollo/client';
-import propLotClient from '../../../propLot/graphql/config';
-import { GET_IDEA_QUERY } from '../../../propLot/graphql/ideaQuery';
-import { virtualTagColorMap } from '../../../utils/virtualTagColors';
-import IdeaVoteControls from '../../../propLot/components/IdeaVoteControls';
-import IdeaRow from '../../../propLot/components/IdeaRow';
+import propLotClient from '../graphql/config';
+import { GET_IDEA_QUERY } from '../graphql/ideaQuery';
+import { virtualTagColorMap } from '../../utils/virtualTagColors';
+import IdeaVoteControls from '../components/IdeaVoteControls';
+import IdeaRow from '../components/IdeaRow';
 
 const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
@@ -333,6 +333,7 @@ const IdeaPage = () => {
           <div className="flex flex-col">
             <h3 className="lodrina font-bold text-3xl mb-2">Description</h3>
             <div
+              className="mt-[-1rem]"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(marked.parse(data.getIdea.description), {
                   ADD_ATTR: ['target'],

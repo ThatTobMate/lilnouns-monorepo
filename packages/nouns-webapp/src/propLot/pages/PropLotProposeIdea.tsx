@@ -5,7 +5,7 @@ import Nav from 'react-bootstrap/Nav';
 import { useHistory, useParams } from 'react-router-dom';
 import Section from '../../layout/Section';
 import { useIdeas } from '../../hooks/useIdeas';
-import classes from '../../pages/Ideas/Ideas.module.css';
+import classes from '../style/Ideas.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
