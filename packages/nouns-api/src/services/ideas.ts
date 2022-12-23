@@ -86,6 +86,7 @@ class IdeasService {
       const ideas = await prisma.idea.findMany({
         where: {
           deleted: false,
+          parentId: null,
         },
         include: {
           votes: {
@@ -137,6 +138,7 @@ class IdeasService {
       const ideas = await prisma.idea.findMany({
         where: {
           ...(hideDeleted && { deleted: false }),
+          parentId: null,
           createdAt: {
             gte: dateRange.gte,
             lte: dateRange.lte,
