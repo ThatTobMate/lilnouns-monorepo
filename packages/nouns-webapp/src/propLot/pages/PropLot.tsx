@@ -1,8 +1,7 @@
 import { Col, Row } from 'react-bootstrap';
 import Section from '../../layout/Section';
-import PropLotHome from '../../propLot/pages/PropLotHome';
-
-import classes from './Ideas.module.css';
+import PropLotHome from './PropLotHome';
+import classes from '../style/Ideas.module.css';
 
 const IdeasPage = () => {
   return (

@@ -118,10 +118,10 @@ const IdeaVoteControls = ({
           ))}
         </span>
       )}
-      <span className="font-bold text-lg sm:text-2xl mr-4 min-w-[75px] text-right hidden sm:block">
+      <span className="font-bold text-lg sm:text-2xl min-w-[75px] text-right hidden sm:block self-center">
         {calculatedVoteCount}
       </span>
-      <div className="flex flex-[row] sm:flex-col items-center sm:items-end justify-center sm:justify-between space-x-3 sm:space-x-0 sm:space-y-1 sm:h-[65px]">
+      <div className="ml-4 flex flex-[row] sm:flex-col items-center sm:items-end justify-center sm:justify-between space-x-3 sm:space-x-0 sm:space-y-1 sm:h-[65px]">
         {!closed && !disableControls && (
           <svg
             onClick={e => {

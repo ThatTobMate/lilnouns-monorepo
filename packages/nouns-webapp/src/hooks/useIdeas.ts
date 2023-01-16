@@ -282,6 +282,49 @@ export const useIdeas = () => {
     }
   };
 
+  const submitProposal = async ({
+    ideaId,
+    title,
+    tldr,
+    description,
+    tags,
+  }: {
+    ideaId: string;
+    title: string;
+    tldr: string;
+    description: string;
+    tags?: string[];
+  }) => {
+    try {
+      const res = await fetch(`${HOST}/proposal`, {
+        method: 'POST',
+        headers: {
+          ...getAuthHeader(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ideaId,
+          title,
+          tldr,
+          description,
+          tags,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to create proposal');
+      }
+
+      history.push(`/proplot/${ideaId}`);
+    } catch (e: any) {
+      const error = {
+        message: e.message || 'Failed to submit your proposal!',
+        status: e.status || 500,
+      };
+      setError(error);
+    }
+  };
+
   // Use to submit an idea
   const submitIdea = async ({
     title,
@@ -424,6 +467,22 @@ export const useIdeas = () => {
         } catch (e) {}
       } else {
         voteOnIdea(formData);
+      }
+    },
+    submitProposal: async (data: {
+      ideaId: string;
+      title: string;
+      tldr: string;
+      description: string;
+      tags: string[];
+    }) => {
+      if (!isLoggedIn()) {
+        try {
+          await triggerSignIn();
+          submitProposal(data);
+        } catch (e) {}
+      } else {
+        submitProposal(data);
       }
     },
     submitIdea: async (data: {

@@ -1,27 +1,29 @@
+// @ts-nocheck
+// TODO -- remove once the graphql types are working again on the front-end
 import React, { useState, useEffect } from 'react';
-import { Button, Col, FormControl, Row } from 'react-bootstrap';
+import { Alert, Button, Col, FormControl, Row } from 'react-bootstrap';
 import { useHistory, useParams } from 'react-router-dom';
 import { useEthers } from '@usedapp/core';
-import Section from '../../../layout/Section';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
-import { useReverseENSLookUp } from '../../../utils/ensLookup';
-import { useShortAddress } from '../../../utils/addressAndENSDisplayUtils';
-import { useIdeas, CommentFormData, Comment as CommentType } from '../../../hooks/useIdeas';
-import { useAuth } from '../../../hooks/useAuth';
-import { useAccountVotes } from '../../../wrappers/nounToken';
 import moment from 'moment';
 import Davatar from '@davatar/react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { createBreakpoint } from 'react-use';
-import { getIdea } from '../../../propLot/graphql/__generated__/getIdea';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons';
+import Section from '../../layout/Section';
+import { useReverseENSLookUp } from '../../utils/ensLookup';
+import { useShortAddress } from '../../utils/addressAndENSDisplayUtils';
+import { useIdeas, CommentFormData, Comment as CommentType } from '../../hooks/useIdeas';
+import { useAuth } from '../../hooks/useAuth';
+import { useAccountVotes } from '../../wrappers/nounToken';
+import { getIdea } from '../graphql/__generated__/getIdea';
 import { useLazyQuery } from '@apollo/client';
-import propLotClient from '../../../propLot/graphql/config';
-import { GET_IDEA_QUERY } from '../../../propLot/graphql/ideaQuery';
-import { virtualTagColorMap } from '../../../utils/virtualTagColors';
-
-import IdeaVoteControls from '../../../propLot/components/IdeaVoteControls';
+import propLotClient from '../graphql/config';
+import { GET_IDEA_QUERY } from '../graphql/ideaQuery';
+import { virtualTagColorMap } from '../../utils/virtualTagColors';
+import IdeaVoteControls from '../components/IdeaVoteControls';
+import IdeaRow from '../components/IdeaRow';
 
 const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
@@ -239,6 +241,8 @@ const IdeaPage = () => {
     client: propLotClient,
   });
 
+  console.log(data);
+
   const ens = useReverseENSLookUp(data?.getIdea?.creatorId || '');
   const shortAddress = useShortAddress(data?.getIdea?.creatorId || '');
 
@@ -264,6 +268,8 @@ const IdeaPage = () => {
     data.getIdea ? vote.voterId === data.getIdea.creatorId : false,
   )?.voter?.lilnounCount;
 
+  const isNounOwner = account !== undefined && hasNouns;
+
   return (
     <Section fullWidth={false}>
       <Col lg={10} className="mx-auto">
@@ -280,7 +286,7 @@ const IdeaPage = () => {
               <span className="text-lg lodrina">Back</span>
             </span>
           </div>
-          <div className="flex flex-col mb-12">
+          <div className="flex flex-col mb-2">
             <div className="flex flex-row justify-between items-center">
               <h1 className="mb-0 lodrina">{data.getIdea.title}</h1>
               <div className="flex flex-row justify-end">
@@ -288,7 +294,7 @@ const IdeaPage = () => {
               </div>
             </div>
             {data.getIdea.tags && data.getIdea.tags.length > 0 && (
-              <div className="flex flex-row gap-[8px] mt-4 flex-wrap">
+              <div className="flex flex-row gap-[8px] mt-1 flex-wrap">
                 {data.getIdea.tags.map(tag => {
                   return (
                     <span
@@ -304,24 +310,7 @@ const IdeaPage = () => {
             )}
           </div>
         </Row>
-        <div className="space-y-8">
-          <div className="flex flex-col">
-            <h3 className="lodrina font-bold text-2xl mb-2">tl:dr</h3>
-            <p>{data.getIdea.tldr}</p>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="lodrina font-bold text-2xl mb-2">Description</h3>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(marked.parse(data.getIdea.description), {
-                  ADD_ATTR: ['target'],
-                }),
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mt-12 whitespace-pre">
+        <div className="flex flex-1 font-bold text-sm text-[#8c8d92] mb-12 whitespace-pre">
           <span
             className="text-[#2B83F6] underline cursor-pointer"
             onClick={() => {
@@ -336,9 +325,56 @@ const IdeaPage = () => {
             data.getIdea.closed ? '| closed' : ''
           }`}
         </div>
+        <div className="space-y-12">
+          <div className="flex flex-col">
+            <h3 className="lodrina font-bold text-3xl">tl:dr</h3>
+            <span>{data.getIdea.tldr}</span>
+          </div>
+          <div className="flex flex-col">
+            <h3 className="lodrina font-bold text-3xl mb-2">Description</h3>
+            <div
+              className="mt-[-1rem]"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(marked.parse(data.getIdea.description), {
+                  ADD_ATTR: ['target'],
+                }),
+              }}
+            />
+          </div>
+          <section>
+            <div className="flex flex-row justify-between mb-4">
+              <h3 className="text-3xl lodrina font-bold">Proposals</h3>
+              <Button
+                disabled={!isNounOwner}
+                className="!bg-[#2B83F6] !text-white !text-[16px] flex-1 sm:flex-none !rounded-[10px] !font-propLot !font-bold !pt-[8px] !pb-[8px] !pl-[16px] !pr-[16px]"
+                onClick={() => history.push(`/proplot/${id}/propose`)}
+              >
+                New Proposal
+              </Button>
+            </div>
+            {data.getIdea.proposals.length === 0 && (
+              <Alert variant="secondary">
+                <Alert.Heading>No proposals found.</Alert.Heading>
+                <p>Proposals submitted by community members will appear here.</p>
+              </Alert>
+            )}
+            {data.getIdea.proposals.map(proposal => {
+              return (
+                <IdeaRow
+                  idea={proposal}
+                  disableControls={true}
+                  nounBalance={0}
+                  refetch={() => {
+                    console.log('refetching soon...');
+                  }}
+                />
+              );
+            })}
+          </section>
+        </div>
 
-        <div className="mt-2 mb-2">
-          <h3 className="text-2xl lodrina font-bold">
+        <div className="mt-12 mb-2">
+          <h3 className="text-3xl lodrina font-bold">
             {comments.filter(c => !!c.deleted)?.length}{' '}
             {comments.filter(c => !!c.deleted)?.length === 1 ? 'comment' : 'comments'}
           </h3>

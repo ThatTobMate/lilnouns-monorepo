@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useEthers } from '@usedapp/core';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { setActiveAccount } from './state/slices/account';
 import { useAuth as usePropLotAuth } from './hooks/useAuth';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { setAlertModal } from './state/slices/application';
+import config, { CHAIN_ID } from './config';
+import { Col, Row } from 'react-bootstrap';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
+import { AvatarProvider } from '@davatar/react';
 import classes from './App.module.css';
 import '../src/css/globals.css';
 import '../src/css/output.css';
@@ -26,17 +31,11 @@ import NotFoundPage from './pages/NotFound';
 import Playground from './pages/Playground';
 import Nouniverse from './pages/Nouniverse';
 import BadgesPage from './pages/Badges';
-import config, { CHAIN_ID } from './config';
-import { Col, Row } from 'react-bootstrap';
-
-import relativeTime from 'dayjs/plugin/relativeTime';
-import dayjs from 'dayjs';
-
-import { AvatarProvider } from '@davatar/react';
-import IdeasPage from './pages/Ideas';
-import IdeaPage from './pages/Ideas/:id';
+import IdeasPage from './propLot/pages/PropLot';
+import IdeaPage from './propLot/pages/PropLotIdeaPage';
+import ProposePage from './propLot/pages/PropLotProposeIdea';
 import PropLotUserProfilePage from './propLot/pages/PropLotUserProfile';
-import CreateIdeaPage from './pages/Ideas/Create';
+import CreateIdeaPage from './propLot/pages/PropLotCreateIdea';
 import DelegatePage from './pages/DelegatePage';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -140,6 +139,7 @@ function App() {
               <Route exact path={['/ideas', '/proplot']} component={IdeasPage} />
               <Route exact path={['/ideas/create', '/proplot/create']} component={CreateIdeaPage} />
               <Route exact path={['/ideas/:id', '/proplot/:id']} component={IdeaPage} />
+              <Route exact path={['/proplot/:id/propose']} component={ProposePage} />
               <Route exact path="/proplot/profile/:id" component={PropLotUserProfilePage} />
               <Route exact path="/vote/:id" component={VotePage} />
               <Route exact path="/vote/nounsdao/:id" component={NounsVotePage} />

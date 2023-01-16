@@ -26,6 +26,9 @@ model Idea {
   tags        Tag[]
   tokenSupplyOnCreate Int? @default(value: 0) // token supply at time of Idea creation.
   deleted     Boolean @default(value: false)
+  proposals   Idea[] @relation("Idea_Proposals")
+  parent      Idea?  @relation("Idea_Proposals", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId    Int?
 }
 
 model User {

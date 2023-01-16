@@ -163,6 +163,8 @@ type Idea {
   closed: Boolean!
   consensus: Float
   deleted: Boolean!
+  proposals: [Idea]
+  parent: Idea
 }
 
 # Enums
