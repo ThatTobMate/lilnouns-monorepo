@@ -229,11 +229,15 @@ class IdeasService {
 
   static async createIdea(
     data: { title: string; tldr: string; description: string; tags: TagType[] },
-    user?: { wallet: string },
+    user?: { wallet: string; lilnounCount: number },
   ) {
     try {
       if (!user) {
         throw new Error('Failed to save idea: missing user details');
+      }
+
+      if (user.lilnounCount < 8 && data.tags.includes('NOUNS')) {
+        throw new Error("Failed to save idea: user doesn't own enough tokens");
       }
 
       const totalSupply = await nounsTotalSupply();

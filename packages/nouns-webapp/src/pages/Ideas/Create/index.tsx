@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Nav from 'react-bootstrap/Nav';
+import { useEthers } from '@usedapp/core';
 import { useHistory } from 'react-router-dom';
 import Section from '../../../layout/Section';
 import { useIdeas } from '../../../hooks/useIdeas';
+import { useAccountVotes } from '../../../wrappers/nounToken';
 import classes from '../Ideas.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
@@ -22,7 +24,9 @@ enum FORM_VALIDATION {
 
 const CreateIdeaPage = () => {
   const history = useHistory();
+  const { account } = useEthers();
   const { submitIdea } = useIdeas();
+  const nounBalance = useAccountVotes(account || undefined) ?? 0;
 
   const [title, setTitle] = useState<string>('');
   const [tldr, setTldr] = useState<string>('');
@@ -61,26 +65,32 @@ const CreateIdeaPage = () => {
     {
       label: 'Suggestion',
       value: 'SUGGESTION',
+      requiredTokens: 1,
     },
     {
       label: 'Governance',
       value: 'GOVERNANCE',
+      requiredTokens: 1,
     },
     {
       label: 'Community',
       value: 'COMMUNITY',
+      requiredTokens: 1,
     },
     {
       label: 'Request',
       value: 'REQUEST',
+      requiredTokens: 1,
     },
     {
       label: 'Other',
       value: 'OTHER',
+      requiredTokens: 1,
     },
     {
       label: 'Nouns DAO Prop',
       value: 'NOUNS',
+      requiredTokens: 8,
     },
   ];
 
@@ -177,27 +187,33 @@ const CreateIdeaPage = () => {
           <p className="lodrina font-bold text-2xl mb-2">Tags</p>
           <span className="text-xs">Apply the tags that relate to your idea. Click to apply.</span>
           <div className="flex flex-row flex-wrap gap-[16px] my-[16px]">
-            {tags.map(tag => (
-              <div className="flex flex-col items-center">
-                <label
-                  htmlFor={tag.label}
-                  className={`cursor-pointer text-blue-500 bg-blue-200 text-xs font-bold rounded-[8px] px-[8px] py-[4px] flex`}
-                >
-                  {tag.label}
-                </label>
-                <input
-                  type="checkbox"
-                  onChange={() => handleTagChange(tag.label)}
-                  name="tags"
-                  id={tag.label}
-                  value={tag.value}
-                  hidden
-                />
-                {selectedTags.includes(tag.label) && (
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-[#49A758] mt-[8px]" />
-                )}
-              </div>
-            ))}
+            {tags.map(tag => {
+              if (nounBalance < tag.requiredTokens) {
+                return null;
+              }
+
+              return (
+                <div className="flex flex-col items-center">
+                  <label
+                    htmlFor={tag.label}
+                    className={`cursor-pointer text-blue-500 bg-blue-200 text-xs font-bold rounded-[8px] px-[8px] py-[4px] flex`}
+                  >
+                    {tag.label}
+                  </label>
+                  <input
+                    type="checkbox"
+                    onChange={() => handleTagChange(tag.label)}
+                    name="tags"
+                    id={tag.label}
+                    value={tag.value}
+                    hidden
+                  />
+                  {selectedTags.includes(tag.label) && (
+                    <FontAwesomeIcon icon={faCheckCircle} className="text-[#49A758] mt-[8px]" />
+                  )}
+                </div>
+              );
+            })}
           </div>
           <div className="flex flex-col my-[16px]">
             <div className="flex justify-between w-full items-center">
