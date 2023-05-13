@@ -4,7 +4,7 @@ import { Link, useHistory } from 'react-router-dom';
 import ProposalStatus from '../ProposalStatus';
 import classes from './ProposalHeader.module.css';
 import navBarButtonClasses from '../NavBarButton/NavBarButton.module.css';
-import { Proposal, useHasVotedOnProposal, useProposalVote } from '../../wrappers/nounsDao';
+import { Proposal, useHasVotedOnProposal, useProposalCount, useProposalVote } from '../../wrappers/nounsDao';
 import clsx from 'clsx';
 import { isMobileScreen } from '../../utils/isMobile';
 import { useUserVotesAsOfBlock } from '../../wrappers/nounToken';
@@ -17,21 +17,21 @@ import { buildEtherscanAddressLink } from '../../utils/etherscan';
 import { transactionLink } from '../ProposalContent';
 import ShortAddress from '../ShortAddress';
 import ProposalNavigation from '../ProposalNavigation';
+import { useBigNounProposalCount } from '../../wrappers/bigNounsDao';
 
 interface ProposalHeaderProps {
   proposal: Proposal;
-  proposalCount: number;
   snapshotProposal?: SnapshotProposal;
   snapshotVoters?: SnapshotVoters[];
   isNounsDAOProp?: boolean;
   isActiveForVoting?: boolean;
   isWalletConnected: boolean;
   submitButtonClickHandler: () => void;
+  isShowVoteModalOpen: boolean;
 }
 
 interface PropNavigationProps { 
   proposal: Proposal;
-  proposalCount: number;
 }
 
 export const useHasVotedOnSnapshotProposal = (snapshotVoters: SnapshotVoters[] | undefined): boolean => {
@@ -41,12 +41,12 @@ export const useHasVotedOnSnapshotProposal = (snapshotVoters: SnapshotVoters[] |
 };
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = props => {
-  const { proposal, proposalCount, isActiveForVoting, isWalletConnected, submitButtonClickHandler , snapshotProposal, isNounsDAOProp, snapshotVoters} = props;
-
+  const { proposal, /*proposalCount,*/ isActiveForVoting, isWalletConnected, submitButtonClickHandler , snapshotProposal, isNounsDAOProp, snapshotVoters, isShowVoteModalOpen} = props;
+  const proposalCount = isNounsDAOProp ? useBigNounProposalCount(): useProposalCount();
   const history = useHistory();
   const isMobile = isMobileScreen();
   const availableVotes = useUserVotesAsOfBlock(proposal?.createdBlock) ?? 0;
-  const hasVoted = !snapshotProposal ? useHasVotedOnProposal(proposal?.id) : useHasVotedOnSnapshotProposal(snapshotVoters) 
+  const hasVoted = !snapshotProposal && !isNounsDAOProp ? useHasVotedOnProposal(proposal?.id) : useHasVotedOnSnapshotProposal(snapshotVoters) 
   const proposalVote = useProposalVote(proposal?.id);
   const proposalCreationTimestamp = !snapshotProposal ? useBlockTimestamp(proposal?.createdBlock) : useBlockTimestamp(Number(snapshotProposal?.snapshot))
   const disableVoteButton = !isWalletConnected || !availableVotes;
@@ -111,6 +111,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = props => {
               isLastProposal={isLastProposal}
               onPrevProposalClick={prevProposalHandler}
               onNextProposalClick={nextProposalHandler}
+              isShowVoteModalOpen={isShowVoteModalOpen}
             />
             <span>
               <div className="d-flex">
