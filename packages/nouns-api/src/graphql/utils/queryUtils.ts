@@ -70,5 +70,46 @@ export const DATE_FILTERS: { [key: string]: any } = {
 };
 
 export const getIsClosed = (idea: any) => {
+  // If you change the closing timeframe then make sure to update the cron task too in app/tasks/lock-ideas.ts
   return moment(idea.createdAt).isBefore(moment().subtract(7, 'days').toISOString());
+};
+
+export const calculateAllVotes = (votes: any) => {
+  let count = 0;
+  let upvotes = 0;
+  let downvotes = 0;
+  const calc = (acc: number, vote: any) => acc + vote.direction * vote.voter.lilnounCount;
+  votes.forEach((vote: any) => {
+    if (vote.direction === 1) {
+      upvotes = calc(upvotes, vote);
+    }
+    if (vote.direction === -1) {
+      downvotes = calc(downvotes, vote);
+    }
+    count = calc(count, vote);
+  });
+
+  return { count, upvotes, downvotes };
+};
+
+export const calculateNetVotes = (ideas: any) => {
+  let netVotes = 0;
+  let netUpvotes = 0;
+  let netDownvotes = 0;
+
+  ideas.forEach((idea: any) => {
+    if (idea.locked) {
+      netVotes += idea.netVotes;
+      netUpvotes += idea.netUpvotes;
+      netDownvotes += idea.netDownvotes;
+    } else {
+      const { count, upvotes, downvotes } = calculateAllVotes(idea.votes);
+
+      netVotes += count;
+      netUpvotes += upvotes;
+      netDownvotes += downvotes;
+    }
+  });
+
+  return { netVotes, netUpvotes, netDownvotes };
 };

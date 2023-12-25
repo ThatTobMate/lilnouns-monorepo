@@ -1,6 +1,6 @@
 import { Idea, TagType } from '@prisma/client';
 import { prisma } from '../api';
-import { DATE_FILTERS, getIsClosed } from '../graphql/utils/queryUtils';
+import { DATE_FILTERS, getIsClosed, calculateAllVotes } from '../graphql/utils/queryUtils';
 import { VirtualTags } from '../virtual';
 import { nounsTotalSupply } from '../utils/utils';
 
@@ -49,15 +49,6 @@ const PROFILE_TAB_FILTERS: { [key: string]: any } = {
   DEFAULT: (_: string) => ({}),
 };
 
-export const calculateVotes = (votes: any) => {
-  let count = 0;
-  votes.forEach((vote: any) => {
-    count = count + vote.direction * vote.voter.lilnounCount;
-  });
-
-  return count;
-};
-
 export const calculateConsensus = (idea: Idea, voteCount: number) => {
   if (!idea.tokenSupplyOnCreate) {
     return undefined;
@@ -70,19 +61,6 @@ export const calculateConsensus = (idea: Idea, voteCount: number) => {
 class IdeasService {
   static async all({ sortBy }: { sortBy?: string }) {
     try {
-      // Investigate issue with votecount db triggers
-
-      // const ideas = await prisma.idea.findMany({
-      //   include: {
-      //     votes: {
-      //       include: {
-      //         voter: true,
-      //       },
-      //     },
-      //   },
-      //   orderBy: SORT_BY[sortBy || 'VOTES_DESC'],
-      // });
-
       const ideas = await prisma.idea.findMany({
         where: {
           deleted: false,
@@ -103,8 +81,15 @@ class IdeasService {
 
       const ideaData = ideas
         .map((idea: any) => {
-          const votecount = calculateVotes(idea.votes);
-          const closed = getIsClosed(idea);
+          let votecount = idea.netVotes;
+          let closed = idea.locked;
+          // Locked property gets set by a cron job that runs every hour. Due to this there could be a period of
+          // time where locked is `false` but `closed` is true so we still want to check for closed items.
+          if (!closed) {
+            const { count } = calculateAllVotes(idea.votes);
+            votecount = count;
+            closed = getIsClosed(idea);
+          }
 
           return { ...idea, votecount, closed };
         })
@@ -160,9 +145,17 @@ class IdeasService {
 
       const ideaData = ideas
         .map((idea: any) => {
-          const votecount = calculateVotes(idea.votes);
+          let votecount = idea.netVotes;
+          let closed = idea.locked;
+          // Locked property gets set by a cron job that runs every hour. Due to this there could be a period of
+          // time where locked is `false` but `closed` is true so we still want to check for closed items.
+          if (!closed) {
+            const { count } = calculateAllVotes(idea.votes);
+            votecount = count;
+            closed = getIsClosed(idea);
+          }
+
           const consensus = calculateConsensus(idea, votecount);
-          const closed = getIsClosed(idea);
 
           return { ...idea, votecount, consensus, closed };
         })
@@ -215,9 +208,15 @@ class IdeasService {
         throw new Error('Idea has been deleted!');
       }
 
-      const votecount = calculateVotes(idea.votes);
+      let votecount = idea.netVotes || 0;
+      let closed = idea.locked;
+      if (!closed) {
+        const { count } = calculateAllVotes(idea.votes);
+        votecount = count;
+        closed = getIsClosed(idea);
+      }
+
       const consensus = calculateConsensus(idea, votecount);
-      const closed = getIsClosed(idea);
 
       const ideaData = { ...idea, closed, consensus, votecount };
 
@@ -440,7 +439,7 @@ class IdeasService {
       throw new Error('Idea not found for comment');
     }
 
-    return getIsClosed(idea);
+    return Boolean(idea.locked) || getIsClosed(idea);
   }
 
   static async deleteIdea(id: number) {

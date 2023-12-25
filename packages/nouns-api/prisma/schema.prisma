@@ -26,6 +26,10 @@ model Idea {
   tags        Tag[]
   tokenSupplyOnCreate Int? @default(value: 0) // token supply at time of Idea creation.
   deleted     Boolean @default(value: false)
+  locked      Boolean? @default(value: false) // No more changes can be made to this idea.
+  netVotes Int? @default(value: 0) // The vote count at the time the idea was locked.
+  netUpvotes Int? @default(value: 0) // The upvote count at the time the idea was locked.
+  netDownvotes Int? @default(value: 0) // The downvote count at the time the idea was locked.
 }
 
 model User {
