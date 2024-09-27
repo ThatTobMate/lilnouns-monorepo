@@ -8,6 +8,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import AuthController from './controllers/auth';
 import bodyParser from 'body-parser';
 import IdeasController from './controllers/ideas';
+import NotificationsController from './controllers/notifications';
 
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, apolloAuthScope } from './middlewares/auth';
@@ -131,6 +132,7 @@ export const createAPI = (): Express => {
   app.post('/token-transfer', authMiddleware, AuthController.syncUserTokenCounts);
   app.delete('/idea/:id', authMiddleware, IdeasController.deleteIdea);
   app.delete('/comment/:id', authMiddleware, IdeasController.deleteComment);
+  app.post('/send-notification', NotificationsController.sendNotification);
 
   app.use(rollbar.errorHandler());
   app.use((err: any, req: Request, res: Response, next: any) => {
